@@ -1,0 +1,7 @@
+--in  ./.windows/winmd/Microsoft.ServiceFabric.ReliableCollectionRuntime.winmd
+--out crates/fabric/c/src/Microsoft.rs
+
+--filter Microsoft
+
+--config
+  package=true

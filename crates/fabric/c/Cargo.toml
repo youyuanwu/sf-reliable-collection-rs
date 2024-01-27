@@ -1,0 +1,20 @@
+[package]
+name = "fabric_c"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies]
+windows-core = "0.51"
+
+[dependencies.windows]
+version = "0.51"
+features = [
+    "Win32_Foundation",
+]
+
+[features]
+Win32_Foundation = []
+ServiceFabric = []
+ServiceFabric_ReliableCollectionRuntime = ["ServiceFabric"]
+
