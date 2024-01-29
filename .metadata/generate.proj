@@ -9,7 +9,7 @@
     <ItemGroup>
         <ImportLibs Include="../build/*.lib" />
         <Partition Include="ReliableCollectionRuntime.cpp">
-            <TraverseFiles>..\include\ReliableCollectionRuntime.h</TraverseFiles>
+            <TraverseFiles>..\include\ReliableCollectionRuntime.h;..\include\Internal.h</TraverseFiles>
             <Namespace>Microsoft.ServiceFabric.ReliableCollectionRuntime</Namespace>
         </Partition>
     </ItemGroup>

@@ -1315,6 +1315,76 @@ pub unsafe fn TxnReplicator_SetNotifyTransactionChangeCallback(
         .ok()
 }
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
+#[repr(transparent)]
+pub struct IFabricDataLossHandler(::windows_core::IUnknown);
+impl IFabricDataLossHandler {
+    pub unsafe fn BeginOnDataLoss(
+        &self,
+        callback: *mut ::core::ffi::c_void,
+        context: *mut *mut ::core::ffi::c_void,
+    ) -> ::windows_core::Result<()> {
+        (::windows_core::Interface::vtable(self).BeginOnDataLoss)(
+            ::windows_core::Interface::as_raw(self),
+            callback,
+            context,
+        )
+        .ok()
+    }
+    pub unsafe fn EndOnDataLoss(
+        &self,
+        context: *mut ::core::ffi::c_void,
+        isstatechanged: *mut u8,
+    ) -> ::windows_core::Result<()> {
+        (::windows_core::Interface::vtable(self).EndOnDataLoss)(
+            ::windows_core::Interface::as_raw(self),
+            context,
+            isstatechanged,
+        )
+        .ok()
+    }
+}
+::windows_core::imp::interface_hierarchy!(IFabricDataLossHandler, ::windows_core::IUnknown);
+impl ::core::cmp::PartialEq for IFabricDataLossHandler {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+impl ::core::cmp::Eq for IFabricDataLossHandler {}
+impl ::core::fmt::Debug for IFabricDataLossHandler {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        f.debug_tuple("IFabricDataLossHandler")
+            .field(&self.0)
+            .finish()
+    }
+}
+unsafe impl ::windows_core::Interface for IFabricDataLossHandler {
+    type Vtable = IFabricDataLossHandler_Vtbl;
+}
+impl ::core::clone::Clone for IFabricDataLossHandler {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+unsafe impl ::windows_core::ComInterface for IFabricDataLossHandler {
+    const IID: ::windows_core::GUID =
+        ::windows_core::GUID::from_u128(0x0bba0a6a_8f00_41b5_9bbf_3ee30357028d);
+}
+#[repr(C)]
+#[doc(hidden)]
+pub struct IFabricDataLossHandler_Vtbl {
+    pub base__: ::windows_core::IUnknown_Vtbl,
+    pub BeginOnDataLoss: unsafe extern "system" fn(
+        this: *mut ::core::ffi::c_void,
+        callback: *mut ::core::ffi::c_void,
+        context: *mut *mut ::core::ffi::c_void,
+    ) -> ::windows_core::HRESULT,
+    pub EndOnDataLoss: unsafe extern "system" fn(
+        this: *mut ::core::ffi::c_void,
+        context: *mut ::core::ffi::c_void,
+        isstatechanged: *mut u8,
+    ) -> ::windows_core::HRESULT,
+}
+#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Add: NotifyStoreChangeCallbackMask = NotifyStoreChangeCallbackMask(1u32);
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Backup_Option_Full: Backup_Option = Backup_Option(1u32);
@@ -2581,3 +2651,5 @@ pub type fnUploadAsync2 = ::core::option::Option<
         uploadasynccompletionctx: *mut ::core::ffi::c_void,
     ) -> (),
 >;
+#[cfg(feature = "implement")]
+::core::include!("impl.rs");

@@ -11,3 +11,25 @@ features = [
   "ServiceFabric_ReliableCollectionRuntime",
   "Win32_Foundation"
 ]
+
+[dependencies.fabric_base]
+git = "https://github.com/youyuanwu/service-fabric-rs.git"
+rev = "3f2bef6eaa5cbbb1b97ee27fb87205ecc9c5ebdb"
+features = [
+    "implement",
+    "ServiceFabric_FabricCommon",
+    "ServiceFabric_FabricCommon_FabricRuntime",
+    "Win32_Foundation"
+]
+
+
+# need to define some com interfaces
+[dependencies.windows]
+version = "0.51"
+features = [
+    "Win32_Foundation",
+]
+
+# tokio oneshot
+[dependencies]
+tokio = { version = "1", features = ["sync"] }

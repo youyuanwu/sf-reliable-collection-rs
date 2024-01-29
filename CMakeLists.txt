@@ -50,3 +50,16 @@ add_custom_target(generate_winmd
   DEPENDS ${_out_winmd_paths}
   ReliableCollectionRuntime # generator needs to scan support lib files
 )
+
+find_program (
+    cargo_exe
+    NAMES cargo.exe
+    REQUIRED
+)
+
+add_custom_target(generate_rust
+  COMMAND ${cargo_exe} run -p tools_api
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_subdirectory(crates/samples/kvstore)
