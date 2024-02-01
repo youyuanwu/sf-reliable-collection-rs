@@ -1,0 +1,40 @@
+// ------------------------------------------------------------
+// Copyright 2024 Youyuan Wu
+// Licensed under the MIT License (MIT). See License.txt in the repo root for
+// license information.
+// ------------------------------------------------------------
+
+syntax = "proto3";
+
+package kvstore_rpc;
+
+service kvstore_service {
+  rpc add (add_request) returns (add_response) {}
+  rpc get (get_request) returns (get_response) {}
+  rpc remove(remove_request) returns (remove_response){}
+}
+
+message add_request {
+  string store_url = 1;
+  string key = 2;
+  string val = 3;
+}
+message add_response {}
+
+message get_request {
+  string store_url = 1;
+  string key = 2;
+}
+message get_response {
+  string val = 1;
+}
+
+message remove_request{
+  string store_url = 1;
+  string key = 2;
+  string conditional_version = 3;
+}
+
+message remove_response{
+  bool removed = 1;
+}

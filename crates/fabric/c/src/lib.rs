@@ -6,6 +6,7 @@
     clippy::missing_safety_doc,
     clippy::too_many_arguments,
     clippy::extra_unused_lifetimes,
-    clippy::useless_transmute
+    clippy::useless_transmute,
+    clippy::unused_unit
 )]
 pub mod Microsoft;

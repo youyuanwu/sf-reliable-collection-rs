@@ -1,10 +1,9 @@
+use async_trait::async_trait;
 use std::{
     cell::Cell,
     ffi::c_void,
     sync::{Arc, Mutex},
 };
-
-use async_trait::async_trait;
 
 use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     IFabricDataLossHandler, TxnReplicator_Settings,
@@ -19,10 +18,8 @@ use fabric_rs::runtime::{
 };
 use log::info;
 use reliable_collection::wrap::{get_txn_replicator, TxnReplicaReplicator};
-use tokio::{
-    select,
-    sync::oneshot::{self, Sender},
-};
+use tokio::sync::oneshot::{self, Sender};
+use tonic::transport::Server;
 use windows_core::{Error, HSTRING};
 
 use crate::utils::DataLossHandler;
@@ -111,28 +108,26 @@ impl Service {
     }
 
     pub fn start_loop(&self) {
-        let (tx, mut rx) = oneshot::channel::<()>();
+        let (tx, rx) = oneshot::channel::<()>();
         self.stop();
         self.tx.lock().unwrap().set(Some(tx));
         let store = self.get_store();
-        self.rt.spawn(async move {
-            let mut counter = 0;
-            loop {
-                info!("Service::run_single: {}", counter);
-                Self::run_single(store.clone()).await.unwrap();
 
-                counter += 1;
-                // sleep or stop
-                select! {
-                    _ = tokio::time::sleep(std::time::Duration::from_secs(10)) => {
-                        continue;
-                    }
-                    _ = &mut rx =>{
-                        info!("Service::loop stopped from rx");
-                        break;
-                    }
-                }
-            }
+        self.rt.spawn(async move {
+            info!("start grpc server.");
+            let svc = rpc::rpc_svc::new(store);
+            let addr = "[::1]:50051".parse().unwrap();
+
+            Server::builder()
+                .add_service(
+                    crate::kvstore::rpc::kvstore_service_server::KvstoreServiceServer::new(svc),
+                )
+                .serve_with_shutdown(addr, async {
+                    rx.await.ok();
+                    println!("Graceful shutdown complete")
+                })
+                .await
+                .unwrap();
         });
     }
 
@@ -141,19 +136,6 @@ impl Service {
         if op.is_some() {
             op.take().unwrap().send(()).unwrap()
         }
-    }
-
-    async fn run_single(kv: Arc<TxnReplicaReplicator>) -> windows_core::Result<()> {
-        let info = kv.txn_replicator_get_info();
-        match info {
-            Ok(t_info) => {
-                info!("replicator info {:?}", t_info)
-            }
-            Err(e) => {
-                info!("replicator info err {}", e)
-            }
-        }
-        Ok(())
     }
 }
 
@@ -201,7 +183,7 @@ impl StatefulServiceReplica for Replica {
     }
     async fn change_role(&self, newrole: Role) -> ::windows_core::Result<HSTRING> {
         info!("Replica::change_role {:?}", newrole);
-        //let addr = self.kv.change_role(newrole.clone()).await?;
+
         if newrole == Role::Primary {
             self.svc.start_loop();
         }
@@ -216,5 +198,194 @@ impl StatefulServiceReplica for Replica {
     fn abort(&self) {
         info!("Replica::abort");
         self.svc.stop();
+    }
+}
+
+// grpc code
+#[allow(non_snake_case)]
+pub mod rpc {
+    use std::sync::Arc;
+
+    use async_trait::async_trait;
+    use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
+        StateProvider_Info, StateProvider_Info_V1_Size, StateProvider_Kind_Store,
+        Store_LockMode_Exclusive,
+    };
+    use reliable_collection::wrap::{StateProvider, TxnReplicaReplicator};
+    use windows::Win32::Foundation::ERROR_NOT_FOUND;
+    use windows_core::{Error, HSTRING, PCWSTR};
+
+    tonic::include_proto!("kvstore_rpc"); // The string specified here must match the proto package name
+
+    pub struct rpc_svc {
+        store: Arc<TxnReplicaReplicator>,
+    }
+
+    impl rpc_svc {
+        pub fn new(store: Arc<TxnReplicaReplicator>) -> rpc_svc {
+            rpc_svc { store }
+        }
+
+        async fn get_state_provider(&self, url: &HSTRING) -> Result<StateProvider, Error> {
+            let txn = self.store.create_transaction().unwrap();
+            let waiter;
+            {
+                let timeout = 3000;
+
+                let store_name = url;
+                let lang = HSTRING::default();
+                let stateproviderinfo = StateProvider_Info {
+                    Size: StateProvider_Info_V1_Size,
+                    Kind: StateProvider_Kind_Store,
+                    LangMetadata: PCWSTR(lang.as_ptr()),
+                };
+                // get store
+                waiter = self.store.get_or_add_state_provider_async(
+                    &txn,
+                    store_name,
+                    &lang,
+                    &stateproviderinfo,
+                    timeout,
+                );
+            }
+            let (sp, _existing) = waiter.await.unwrap()?;
+            txn.commit_async().await.unwrap()?;
+            Ok(sp)
+        }
+
+        async fn add_interal(
+            &self,
+            sp: &StateProvider,
+            key: &HSTRING,
+            val: String,
+        ) -> Result<(), Error> {
+            let txnn = self.store.create_transaction()?;
+            let waiter = sp.add_async(&txnn, key, val.as_bytes(), 3000);
+            waiter.await.unwrap()?;
+            txnn.commit_async().await.unwrap()
+        }
+
+        async fn get_internal(&self, sp: &StateProvider, key: &HSTRING) -> Result<String, Error> {
+            let txn = self.store.create_transaction()?;
+            let waiter = sp.conditional_get_async(&txn, key, 3000, Store_LockMode_Exclusive);
+            let (found, val, _) = waiter.await.unwrap()?;
+            txn.commit_async().await.unwrap()?;
+
+            if !found.as_bool() {
+                Err(Error::from(ERROR_NOT_FOUND))
+            } else {
+                Ok(String::from_utf8_lossy(val.as_slice()).into_owned())
+            }
+        }
+
+        async fn remove_internal(&self, sp: &StateProvider, key: &HSTRING) -> Result<bool, Error> {
+            let txn = self.store.create_transaction()?;
+            let waiter = sp.conditional_remove_async(&txn, key, 3000, 0);
+            let removed = waiter.await.unwrap()?;
+            txn.commit_async().await.unwrap()?;
+            Ok(removed.as_bool())
+        }
+    }
+
+    #[async_trait]
+    impl kvstore_service_server::KvstoreService for rpc_svc {
+        async fn add(
+            &self,
+            request: tonic::Request<AddRequest>,
+        ) -> std::result::Result<tonic::Response<AddResponse>, tonic::Status> {
+            let req = request.into_inner();
+            let store_url = HSTRING::from(req.store_url);
+            let sp = self.get_state_provider(&store_url).await;
+            if sp.is_err() {
+                return Err(tonic::Status::internal(format!(
+                    "Cannot get state provider {}",
+                    sp.unwrap_err()
+                )));
+            }
+            let sp = sp.unwrap();
+
+            let key = HSTRING::from(req.key);
+            let val = req.val;
+
+            let ok = self.add_interal(&sp, &key, val).await;
+            match ok {
+                Ok(_) => {
+                    let resp = AddResponse {};
+                    Ok(tonic::Response::new(resp))
+                }
+                Err(e) => Err(tonic::Status::internal(format!("cannot add : {}", e))),
+            }
+        }
+        async fn get(
+            &self,
+            request: tonic::Request<GetRequest>,
+        ) -> std::result::Result<tonic::Response<GetResponse>, tonic::Status> {
+            let req = request.into_inner();
+            let store_url = HSTRING::from(req.store_url);
+            let sp = self.get_state_provider(&store_url).await;
+            if sp.is_err() {
+                return Err(tonic::Status::internal(format!(
+                    "Cannot get state provider {}",
+                    sp.unwrap_err()
+                )));
+            }
+            let sp = sp.unwrap();
+
+            let key = HSTRING::from(req.key);
+
+            let ok = self.get_internal(&sp, &key).await;
+            match ok {
+                Ok(val) => {
+                    let resp = GetResponse { val };
+                    Ok(tonic::Response::new(resp))
+                }
+                Err(e) => Err(tonic::Status::internal(format!("cannot get : {}", e))),
+            }
+        }
+        async fn remove(
+            &self,
+            request: tonic::Request<RemoveRequest>,
+        ) -> std::result::Result<tonic::Response<RemoveResponse>, tonic::Status> {
+            let req = request.into_inner();
+            let store_url = HSTRING::from(req.store_url);
+            let sp = self.get_state_provider(&store_url).await;
+            if sp.is_err() {
+                return Err(tonic::Status::internal(format!(
+                    "Cannot get state provider {}",
+                    sp.unwrap_err()
+                )));
+            }
+            let sp = sp.unwrap();
+
+            let key = HSTRING::from(req.key);
+
+            let ok = self.remove_internal(&sp, &key).await;
+            match ok {
+                Ok(removed) => {
+                    let resp = RemoveResponse { removed };
+                    Ok(tonic::Response::new(resp))
+                }
+                Err(e) => Err(tonic::Status::internal(format!("cannot remove : {}", e))),
+            }
+        }
+    }
+
+    #[cfg(test)]
+    mod test {
+        #[tokio::test]
+        async fn test_connect() {
+            let mut client =
+                super::kvstore_service_client::KvstoreServiceClient::connect("http://[::1]:50051")
+                    .await
+                    .unwrap();
+
+            let req = tonic::Request::new(super::AddRequest {
+                store_url: String::from("fabric:/mystore"),
+                key: String::from("mykey"),
+                val: String::from("myval"),
+            });
+            let response = client.add(req).await;
+            println!("RESPONSE={:?}", response);
+        }
     }
 }

@@ -1,6 +1,8 @@
 workspace = { members = [
-  "crates/tools/*","crates/fabric/*"
-, "crates/samples/*"] }
+  "crates/tools/*",
+  "crates/fabric/*",
+  "crates/samples/*"] }
+
 [package]
 name = "sf-reliable-collection-rs"
 version = "0.1.0"

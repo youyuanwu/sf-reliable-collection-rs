@@ -37,6 +37,7 @@ fn main() -> windows::core::Result<()> {
     let _init = ReliableCollectionRuntime::create();
 
     let rt = tokio::runtime::Runtime::new().unwrap();
+
     let e = DefaultExecutor::new(rt.handle().clone());
     let runtime = fabric_rs::runtime::Runtime::create(e.clone()).unwrap();
     let actctx = ActivationContext::create().unwrap();
