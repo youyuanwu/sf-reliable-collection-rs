@@ -278,12 +278,35 @@ pub mod rpc {
             }
         }
 
-        async fn remove_internal(&self, sp: &StateProvider, key: &HSTRING) -> Result<bool, Error> {
+        async fn remove_internal(&self, sp: &StateProvider, key: &HSTRING, conditionalversion: i64) -> Result<bool, Error> {
             let txn = self.store.create_transaction()?;
-            let waiter = sp.conditional_remove_async(&txn, key, 3000, 0);
+            let waiter = sp.conditional_remove_async(&txn, key, 3000, conditionalversion);
             let removed = waiter.await.unwrap()?;
             txn.commit_async().await.unwrap()?;
             Ok(removed.as_bool())
+        }
+
+        async fn enumerate_all_internal(
+            &self,
+            sp: &StateProvider,
+        ) -> Result<Vec<(String, String)>, Error> {
+            let txn = self.store.create_transaction()?;
+            let enu = sp.create_enumerator_async(&txn).await.unwrap()?;
+
+            let mut result = Vec::<(String, String)>::new();
+
+            loop {
+                let (advanced, key, data, _) = enu.move_next_async().await.unwrap()?;
+                if !advanced.as_bool() {
+                    break;
+                }
+                result.push((
+                    key.to_string(),
+                    String::from_utf8_lossy(data.as_slice()).into_owned(),
+                ))
+            }
+            txn.commit_async().await.unwrap()?;
+            Ok(result)
         }
     }
 
@@ -358,11 +381,41 @@ pub mod rpc {
             let sp = sp.unwrap();
 
             let key = HSTRING::from(req.key);
+            let conditionalversion = req.conditional_version;
 
-            let ok = self.remove_internal(&sp, &key).await;
+            let ok = self.remove_internal(&sp, &key, conditionalversion).await;
             match ok {
                 Ok(removed) => {
                     let resp = RemoveResponse { removed };
+                    Ok(tonic::Response::new(resp))
+                }
+                Err(e) => Err(tonic::Status::internal(format!("cannot remove : {}", e))),
+            }
+        }
+
+        async fn enumerate_all(
+            &self,
+            request: tonic::Request<EnumerateRequest>,
+        ) -> std::result::Result<tonic::Response<EnumerateResponse>, tonic::Status> {
+            let req = request.into_inner();
+            let store_url = HSTRING::from(req.store_url);
+            let sp = self.get_state_provider(&store_url).await;
+            if sp.is_err() {
+                return Err(tonic::Status::internal(format!(
+                    "Cannot get state provider {}",
+                    sp.unwrap_err()
+                )));
+            }
+            let sp = sp.unwrap();
+            let ok = self.enumerate_all_internal(&sp).await;
+            match ok {
+                Ok(v) => {
+                    let resp = EnumerateResponse {
+                        payload: v
+                            .into_iter()
+                            .map(|(k, v)| enumerate_response::KeyValue { key: k, value: v })
+                            .collect(),
+                    };
                     Ok(tonic::Response::new(resp))
                 }
                 Err(e) => Err(tonic::Status::internal(format!("cannot remove : {}", e))),
@@ -379,13 +432,43 @@ pub mod rpc {
                     .await
                     .unwrap();
 
-            let req = tonic::Request::new(super::AddRequest {
-                store_url: String::from("fabric:/mystore"),
-                key: String::from("mykey"),
-                val: String::from("myval"),
-            });
-            let response = client.add(req).await;
-            println!("RESPONSE={:?}", response);
+            let store_url = String::from("fabric:/mystore");
+
+            // delete all entries
+            {
+                let req = tonic::Request::new(super::EnumerateRequest {
+                    store_url: store_url.clone(),
+                });
+                let resp = client.enumerate_all(req).await.unwrap();
+                for kv in resp.into_inner().payload {
+                    let r = tonic::Request::new(super::RemoveRequest {
+                        store_url: store_url.clone(),
+                        key: kv.key,
+                        conditional_version: -1, // -1 means ignore
+                    });
+                    let rp = client.remove(r).await.unwrap();
+                    assert!(rp.into_inner().removed);
+                }
+            }
+            // add
+            {
+                let req = tonic::Request::new(super::AddRequest {
+                    store_url: store_url.clone(),
+                    key: String::from("mykey"),
+                    val: String::from("myval"),
+                });
+                let response = client.add(req).await;
+                println!("RESPONSE={:?}", response);
+            }
+            // get
+            {
+                let req = tonic::Request::new(super::GetRequest {
+                    store_url: store_url.clone(),
+                    key: String::from("mykey"),
+                });
+                let response = client.get(req).await;
+                println!("RESPONSE={:?}", response);
+            }
         }
     }
 }

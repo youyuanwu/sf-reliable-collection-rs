@@ -12,6 +12,7 @@ service kvstore_service {
   rpc add (add_request) returns (add_response) {}
   rpc get (get_request) returns (get_response) {}
   rpc remove(remove_request) returns (remove_response){}
+  rpc enumerate_all(enumerate_request) returns (enumerate_response){}
 }
 
 message add_request {
@@ -32,9 +33,19 @@ message get_response {
 message remove_request{
   string store_url = 1;
   string key = 2;
-  string conditional_version = 3;
+  int64 conditional_version = 3;
 }
-
 message remove_response{
   bool removed = 1;
+}
+
+message enumerate_request{
+  string store_url = 1;
+}
+message enumerate_response{
+  message key_value{
+    string key = 1;
+    string value = 2;
+  }
+  repeated key_value payload = 1;
 }

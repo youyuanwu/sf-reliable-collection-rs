@@ -1,20 +1,23 @@
 use core::slice;
-use std::ffi::c_void;
+use std::{ffi::c_void, ptr::addr_of_mut};
 
 use fabric_base::FabricCommon::FabricRuntime::{
     IFabricPrimaryReplicator, IFabricStatefulServicePartition,
 };
 use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
-    fnNotifyAsyncCompletion, fnNotifyGetAsyncCompletion,
-    fnNotifyGetOrAddStateProviderAsyncCompletion, fnNotifyRemoveAsyncCompletion, Buffer,
-    Buffer_Release, CancellationTokenSource_Cancel, CancellationTokenSource_Release,
-    GetTxnReplicator, IFabricDataLossHandler, ReliableCollectionRuntime_Initialize,
-    ReliableCollectionRuntime_Initialize2, StateProvider_Info, Store_AddAsync,
-    Store_ConditionalGetAsync, Store_ConditionalRemoveAsync, Store_GetCount, Store_LockMode,
-    Store_Release, Transaction_Abort, Transaction_AddRef, Transaction_CommitAsync,
-    Transaction_Dispose, Transaction_Release, TxnReplicator_CreateTransaction,
-    TxnReplicator_GetInfo, TxnReplicator_GetOrAddStateProviderAsync, TxnReplicator_Info,
-    TxnReplicator_Release, TxnReplicator_Settings, RELIABLECOLLECTION_API_VERSION,
+    fnNotifyAsyncCompletion, fnNotifyCreateEnumeratorAsyncCompletion, fnNotifyGetAsyncCompletion,
+    fnNotifyGetOrAddStateProviderAsyncCompletion, fnNotifyRemoveAsyncCompletion,
+    fnNotifyStoreKeyValueEnumeratorMoveNextAsyncCompletion, Buffer, Buffer_Release,
+    CancellationTokenSource_Cancel, CancellationTokenSource_Release, GetTxnReplicator,
+    IFabricDataLossHandler, ReliableCollectionRuntime_Initialize,
+    ReliableCollectionRuntime_Initialize2, StateProvider_Info,
+    StoreKeyValueEnumerator_MoveNextAsync, StoreKeyValueEnumerator_Release, Store_AddAsync,
+    Store_ConditionalGetAsync, Store_ConditionalRemoveAsync, Store_CreateEnumeratorAsync,
+    Store_GetCount, Store_LockMode, Store_Release, Transaction_Abort, Transaction_AddRef,
+    Transaction_CommitAsync, Transaction_Dispose, Transaction_Release,
+    TxnReplicator_CreateTransaction, TxnReplicator_GetInfo,
+    TxnReplicator_GetOrAddStateProviderAsync, TxnReplicator_Info, TxnReplicator_Release,
+    TxnReplicator_Settings, RELIABLECOLLECTION_API_VERSION,
 };
 use tokio::sync::oneshot::{self, Receiver, Sender};
 use windows::{
@@ -242,6 +245,19 @@ impl TempBuffer {
         assert!(!self.b.Handle.is_null());
         unsafe { Buffer_Release(self.b.Handle) };
     }
+
+    pub fn init_void_addr(&mut self) -> *mut Buffer {
+        std::ptr::addr_of_mut!(self.b)
+    }
+
+    pub fn to_vec(&self) -> Vec<u8> {
+        Self::raw_to_vec(self.b.Bytes.0, self.b.Length as usize)
+    }
+
+    fn raw_to_vec(data: *const u8, len: usize) -> Vec<u8> {
+        let val_view = unsafe { slice::from_raw_parts(data, len) };
+        val_view.into()
+    }
 }
 
 impl Drop for TempBuffer {
@@ -358,10 +374,7 @@ impl StateProvider {
                     };
                     let mut val = Vec::<u8>::default();
                     if found.as_bool() {
-                        let val_view = unsafe {
-                            slice::from_raw_parts(buff.b.Bytes.0, buff.b.Length as usize)
-                        };
-                        val = val_view.into();
+                        val = buff.to_vec();
                     }
                     ctx_back
                         .send(Ok((found, val, version_sequence_number)))
@@ -507,6 +520,71 @@ impl StateProvider {
         };
         rx
     }
+
+    unsafe extern "system" fn create_enumerator_async_callback(
+        ctx: *mut ::core::ffi::c_void,
+        status: HRESULT,
+        enumerator: *mut ::core::ffi::c_void,
+    ) {
+        let ctx_back =
+            unsafe { Box::from_raw(ctx as *mut Sender<Result<KeyValueEnumerator, Error>>) };
+
+        let ok = if status.is_err() {
+            ctx_back.send(Err(Error::from(status)))
+        } else {
+            let enu = KeyValueEnumerator { h: enumerator };
+            ctx_back.send(Ok(enu))
+        };
+        if ok.is_err() {
+            debug_assert!(false, "frontend dropped");
+        }
+    }
+
+    pub fn create_enumerator_async(
+        &self,
+        txn: &Txn,
+    ) -> Receiver<Result<KeyValueEnumerator, Error>> {
+        let mut enu = KeyValueEnumerator::default();
+        let mut synchronouscomplete = BOOL::default();
+
+        let callback: fnNotifyCreateEnumeratorAsyncCompletion =
+            Some(Self::create_enumerator_async_callback);
+        let (tx, rx) = oneshot::channel();
+
+        // prepare ctx
+        let ctx = Box::new(tx);
+        let ctx_raw = &*ctx as *const Sender<Result<KeyValueEnumerator, Error>>;
+        std::mem::forget(ctx); // forget in front end.
+
+        let ok = unsafe {
+            Store_CreateEnumeratorAsync(
+                self.h,
+                txn.h,
+                enu.init_void_addr(),
+                callback,
+                ctx_raw as *const c_void,
+                addr_of_mut!(synchronouscomplete),
+            )
+        };
+
+        match ok {
+            Ok(_) => {
+                if synchronouscomplete.as_bool() {
+                    let ctx_back = unsafe {
+                        Box::from_raw(ctx_raw as *mut Sender<Result<KeyValueEnumerator, Error>>)
+                    };
+                    ctx_back.send(Ok(enu)).unwrap();
+                }
+            }
+            Err(e) => {
+                let ctx_back = unsafe {
+                    Box::from_raw(ctx_raw as *mut Sender<Result<KeyValueEnumerator, Error>>)
+                };
+                ctx_back.send(Err(e)).unwrap();
+            }
+        };
+        rx
+    }
 }
 
 impl Drop for StateProvider {
@@ -591,6 +669,138 @@ impl Drop for Txn {
         if !self.h.is_null() {
             self.dispose();
             self.release()
+        }
+    }
+}
+
+// enumerator
+#[derive(Debug)]
+pub struct KeyValueEnumerator {
+    h: *mut std::ffi::c_void,
+}
+
+unsafe impl Send for KeyValueEnumerator {}
+
+impl KeyValueEnumerator {
+    fn init_void_addr(&mut self) -> *mut *mut std::ffi::c_void {
+        std::ptr::addr_of_mut!(self.h)
+    }
+
+    pub fn release(&mut self) {
+        assert!(!self.h.is_null());
+        unsafe { StoreKeyValueEnumerator_Release(self.h) };
+        self.h = std::ptr::null_mut();
+    }
+
+    unsafe extern "system" fn move_next_async_callback(
+        ctx: *mut ::core::ffi::c_void,
+        status: HRESULT,
+        advanced: ::windows::Win32::Foundation::BOOL,
+        key: PCWSTR,
+        _objecthandle: usize,
+        bytebuffer: *mut ::core::ffi::c_void,
+        bufferlength: u32,
+        versionsequencenumber: i64,
+    ) {
+        let ctx_back = unsafe {
+            Box::from_raw(ctx as *mut Sender<Result<(BOOL, HSTRING, Vec<u8>, i64), Error>>)
+        };
+
+        let ok = if status.is_err() {
+            ctx_back.send(Err(Error::from(status)))
+        } else {
+            ctx_back.send(Ok((
+                advanced,
+                HSTRING::from_wide(unsafe { key.as_wide() }).unwrap(),
+                TempBuffer::raw_to_vec(bytebuffer as *const u8, bufferlength as usize),
+                versionsequencenumber,
+            )))
+        };
+        if ok.is_err() {
+            debug_assert!(false, "frontend dropped");
+        }
+    }
+
+    // advanced, key, val, vsn
+    pub fn move_next_async(&self) -> Receiver<Result<(BOOL, HSTRING, Vec<u8>, i64), Error>> {
+        let mut cts = CancellationToken::default();
+        let mut advanced = BOOL::default();
+        let mut key = PCWSTR::null();
+        let mut objecthandle = usize::default();
+        let mut buff = TempBuffer::default();
+        let mut versionsequencenumber = i64::default();
+        let callback: fnNotifyStoreKeyValueEnumeratorMoveNextAsyncCompletion =
+            Some(Self::move_next_async_callback);
+
+        let (tx, rx) = oneshot::channel();
+        let ctx = Box::new(tx);
+        let ctx_raw = &*ctx as *const Sender<Result<(BOOL, HSTRING, Vec<u8>, i64), Error>>;
+        std::mem::forget(ctx); // forget in front end.
+        let mut synchronouscomplete = BOOL::default();
+
+        let ok = unsafe {
+            StoreKeyValueEnumerator_MoveNextAsync(
+                self.h,
+                cts.init_void_addr(),
+                std::ptr::addr_of_mut!(advanced),
+                std::ptr::addr_of_mut!(key),
+                std::ptr::addr_of_mut!(objecthandle),
+                buff.init_void_addr(),
+                std::ptr::addr_of_mut!(versionsequencenumber),
+                callback,
+                ctx_raw as *const c_void,
+                std::ptr::addr_of_mut!(synchronouscomplete),
+            )
+        };
+
+        match ok {
+            Ok(()) => {
+                if synchronouscomplete.as_bool() {
+                    // no callback will be invoked
+                    let ctx_back = unsafe {
+                        Box::from_raw(
+                            ctx_raw as *mut Sender<Result<(BOOL, HSTRING, Vec<u8>, i64), Error>>,
+                        )
+                    };
+                    let (k, v) = if advanced.as_bool() {
+                        (
+                            HSTRING::from_wide(unsafe { key.as_wide() }).unwrap(),
+                            buff.to_vec(),
+                        )
+                    } else {
+                        (HSTRING::default(), Vec::<u8>::new())
+                    };
+                    ctx_back
+                        .send(Ok((advanced, k, v, versionsequencenumber)))
+                        .unwrap();
+                }
+            }
+            Err(e) => {
+                // no callback will be invoked
+                let ctx_back = unsafe {
+                    Box::from_raw(
+                        ctx_raw as *mut Sender<Result<(BOOL, HSTRING, Vec<u8>, i64), Error>>,
+                    )
+                };
+                ctx_back.send(Err(e)).unwrap();
+            }
+        }
+        rx
+    }
+}
+
+impl Drop for KeyValueEnumerator {
+    fn drop(&mut self) {
+        if !self.h.is_null() {
+            self.release();
+        }
+    }
+}
+
+impl Default for KeyValueEnumerator {
+    fn default() -> Self {
+        Self {
+            h: std::ptr::null_mut(),
         }
     }
 }
