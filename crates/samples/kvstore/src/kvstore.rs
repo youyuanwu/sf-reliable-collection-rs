@@ -4,7 +4,6 @@
 // license information.
 // ------------------------------------------------------------
 
-use async_trait::async_trait;
 use std::{
     cell::Cell,
     ffi::c_void,
@@ -52,7 +51,7 @@ fn get_addr(port: u32, hostname: HSTRING) -> String {
     addr
 }
 
-impl StatefulServiceFactory<Replica> for Factory {
+impl StatefulServiceFactory for Factory {
     fn create_replica(
         &self,
         servicetypename: &windows_core::HSTRING,
@@ -60,7 +59,7 @@ impl StatefulServiceFactory<Replica> for Factory {
         initializationdata: &[u8],
         partitionid: &windows::core::GUID,
         replicaid: i64,
-    ) -> Result<Replica, Error> {
+    ) -> Result<impl StatefulServiceReplica, Error> {
         info!(
             "Factory::create_replica type {}, service {}, init data size {}, partid {:?}",
             servicetypename,
@@ -145,13 +144,12 @@ impl Service {
     }
 }
 
-#[async_trait]
 impl StatefulServiceReplica for Replica {
     async fn open(
         &self,
         openmode: OpenMode,
         partition: &StatefulServicePartition,
-    ) -> windows::core::Result<Box<dyn PrimaryReplicator>> {
+    ) -> windows::core::Result<impl PrimaryReplicator> {
         // should be primary replicator
         info!("Replica::open {:?}", openmode);
 
@@ -184,8 +182,7 @@ impl StatefulServiceReplica for Replica {
 
         self.svc.set_store(txnp);
 
-        let p_proxy = Box::new(PrimaryReplicatorProxy::new(p));
-        Ok(p_proxy)
+        Ok(PrimaryReplicatorProxy::new(p))
     }
     async fn change_role(&self, newrole: Role) -> ::windows_core::Result<HSTRING> {
         info!("Replica::change_role {:?}", newrole);

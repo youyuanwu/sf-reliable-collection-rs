@@ -14,7 +14,7 @@ features = [
 
 [dependencies.fabric_base]
 git = "https://github.com/youyuanwu/service-fabric-rs.git"
-rev = "3f2bef6eaa5cbbb1b97ee27fb87205ecc9c5ebdb"
+rev = "e2a2cd4a4019317061d1fdb043c322719f21399e"
 features = [
     "implement",
     "ServiceFabric_FabricCommon",
@@ -32,4 +32,4 @@ features = [
 
 # tokio oneshot
 [dependencies]
-tokio = { version = "1", features = ["sync"] }
+tokio = { version = "*", features = ["sync"] }

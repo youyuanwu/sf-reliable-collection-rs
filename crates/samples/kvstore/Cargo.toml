@@ -6,13 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-log = "0.4"
+log = "*"
 env_logger = "*"
 tokio = { version = "1", features = ["full"] }
 windows-core = "0.51"
-async-trait = "0.1"
-tonic = "0.9"
-prost = "0.11"
+async-trait = "*" # needed by tonic
+tonic = "*"
+prost = "*"
 
 [dependencies.windows]
 version = "0.51"
@@ -22,7 +22,7 @@ features = [
 
 [dependencies.fabric_base]
 git = "https://github.com/youyuanwu/service-fabric-rs.git"
-rev = "3f2bef6eaa5cbbb1b97ee27fb87205ecc9c5ebdb"
+rev = "e2a2cd4a4019317061d1fdb043c322719f21399e"
 features = [
     "implement",
     "ServiceFabric_FabricCommon",
@@ -32,7 +32,7 @@ features = [
 
 [dependencies.fabric_rs]
 git = "https://github.com/youyuanwu/service-fabric-rs.git"
-rev = "3f2bef6eaa5cbbb1b97ee27fb87205ecc9c5ebdb"
+rev = "e2a2cd4a4019317061d1fdb043c322719f21399e"
 
 [dependencies.reliable_collection]
 path = "../../fabric/reliable_collection"
@@ -43,8 +43,8 @@ path = "../../fabric/c"
 features = ["implement"]
 
 [build-dependencies]
-tonic-build = "0.9"
-prost-build = "0.11"
+tonic-build = "*"
+prost-build = "*"
 
 [package.metadata.rust-analyzer]
 cargo.loadOutDirsFromCheck = true
