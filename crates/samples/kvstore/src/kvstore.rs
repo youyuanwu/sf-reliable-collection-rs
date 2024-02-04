@@ -1,3 +1,9 @@
+// ------------------------------------------------------------
+// Copyright 2024 Youyuan Wu
+// Licensed under the MIT License (MIT). See License in the repo root for
+// license information.
+// ------------------------------------------------------------
+
 use async_trait::async_trait;
 use std::{
     cell::Cell,
@@ -278,7 +284,12 @@ pub mod rpc {
             }
         }
 
-        async fn remove_internal(&self, sp: &StateProvider, key: &HSTRING, conditionalversion: i64) -> Result<bool, Error> {
+        async fn remove_internal(
+            &self,
+            sp: &StateProvider,
+            key: &HSTRING,
+            conditionalversion: i64,
+        ) -> Result<bool, Error> {
             let txn = self.store.create_transaction()?;
             let waiter = sp.conditional_remove_async(&txn, key, 3000, conditionalversion);
             let removed = waiter.await.unwrap()?;

@@ -1,3 +1,9 @@
+// ------------------------------------------------------------
+// Copyright 2024 Youyuan Wu
+// Licensed under the MIT License (MIT). See License in the repo root for
+// license information.
+// ------------------------------------------------------------
+
 #[allow(
     non_camel_case_types,
     non_snake_case,

@@ -1,3 +1,9 @@
+// ------------------------------------------------------------
+// Copyright 2024 Youyuan Wu
+// Licensed under the MIT License (MIT). See License in the repo root for
+// license information.
+// ------------------------------------------------------------
+
 use fabric_base::FabricCommon::{IFabricAsyncOperationCallback, IFabricAsyncOperationContext};
 use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     IFabricDataLossHandler, IFabricDataLossHandler_Impl,
