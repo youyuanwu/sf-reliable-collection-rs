@@ -1,0 +1,129 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        BUILD_TYPE: ["Debug"]
+        os: [ windows-latest ]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Get specific version CMake, v3.21.2
+      uses: lukka/get-cmake@v3.21.2
+
+    - name: Install rust stable
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    - name: run cmake
+      run: > 
+        cmake . -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -B build
+    - name: run build
+      run: |
+        cmake --build build --config ${{ matrix.BUILD_TYPE }}
+
+    # mysql bin has conflicting dlls with fabric than prevents fabric from starting
+    - name: Remove conflict dll paths
+      shell: powershell
+      run: |
+        get-command libprotobuf.dll | format-list
+        Remove-Item -Recurse -Force "C:\Program Files\MySQL\MySQL Server 8.0\bin"
+
+    - name: start sf cluster
+      shell: pwsh
+      run: |
+        Powershell.exe -File "C:\Program Files\Microsoft SDKs\Service Fabric\ClusterSetup\DevClusterSetup.ps1" -CreateOneNodeCluster
+        Start-Sleep -Seconds 20
+        Connect-ServiceFabricCluster
+      
+    - name: provision app
+      run: Powershell.exe -File scripts/kvstore_ctl.ps1 -Action Add
+
+    - name: run all unittests
+      run: cargo test --all
+
+  build-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        BUILD_TYPE: ["Debug"]
+        os: [ ubuntu-20.04 ]
+    steps:
+    - uses: actions/checkout@v4
+    - name: apt-get
+      run: sudo apt-get update && sudo apt-get install apt-transport-https curl lsb-release wget gnupg2 software-properties-common debconf-utils clang lld -y
+
+    - name: install sf
+      run: |
+        wget -q https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb;
+        sudo dpkg -i packages-microsoft-prod.deb;
+        curl -fsSL https://packages.microsoft.com/keys/msopentech.asc | sudo apt-key add - ;
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - ;
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" ;
+        sudo apt-get update;
+        echo "servicefabric servicefabric/accepted-eula-ga select true" | sudo debconf-set-selections ;
+        echo "servicefabricsdkcommon servicefabricsdkcommon/accepted-eula-ga select true" | sudo debconf-set-selections ;
+        sudo apt-get install servicefabricsdkcommon -y;
+        echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/microsoft/servicefabric/bin/Fabric/Fabric.Code" >> $GITHUB_ENV
+
+    - name: Get specific version CMake, v3.21.2
+      uses: lukka/get-cmake@v3.21.2
+
+    - name: Install rust stable
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    
+    - name: run cmake
+      run: > 
+        cmake . -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -B build
+    - name: run build
+      run: cmake --build build --config ${{ matrix.BUILD_TYPE }}
+
+    - name: install sfctl
+      run: |
+        pip3 install -I sfctl==11.1.0
+        echo "~/.local/bin" >> $GITHUB_PATH
+    
+    - name: test sfctl
+      run: sfctl --version
+
+    - name: start sf
+      run: sudo /opt/microsoft/sdk/servicefabric/common/clustersetup/devclustersetup.sh --createonenodecluster
+
+    - name: test cluster health
+      run: |
+        set +e # do not exit on error
+        counter=0
+        COMMAND_STATUS=1
+        until [ $COMMAND_STATUS -eq 0 ]; do
+          echo "attempt #${counter}"
+          sfctl cluster select
+          COMMAND_STATUS=$?
+          sleep 1
+          let counter=counter+1
+          if [[ $counter -eq 10 ]] ;
+          then
+            echo "Retry max reached" && exit 1
+          fi
+        done
+        sfctl cluster health
+    
+    - name: provision app
+      run: |
+        sleep 120 # wait for cluster to be up
+        bash ./scripts/kvstore_ctl.sh -a add
+        sleep 300s
+        sfctl service health --service-id KvStore/KvStoreService
+        # sfctl service resolve --service-id KvStore/KvStoreService
+    # TODO: cannot resolve in ci
+    # - name: run all unittests
+    #   run: cargo test --all

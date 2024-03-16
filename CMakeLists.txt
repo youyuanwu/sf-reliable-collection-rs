@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(sf-reliable-collection-rs LANGUAGES)
 
+if(WIN32)
 message(STATUS "fetching fabric_metadata")
 include(FetchContent)
 FetchContent_Declare(fabric_metadata
@@ -50,10 +51,15 @@ add_custom_target(generate_winmd
   DEPENDS ${_out_winmd_paths}
   ReliableCollectionRuntime # generator needs to scan support lib files
 )
+add_custom_target(generate_import_lib ALL
+  DEPENDS
+  ReliableCollectionRuntime
+)
+endif(WIN32)
 
 find_program (
     cargo_exe
-    NAMES cargo.exe
+    NAMES cargo.exe cargo
     REQUIRED
 )
 
@@ -62,11 +68,6 @@ add_custom_target(generate_rust
   COMMAND ${cargo_exe} run -p tools_api
   COMMAND powershell -Command "\"(Get-Content ${_rc_file}).Replace('\\\"reliablecollectionruntime\\\"','\\\"ReliableCollectionRuntime\\\"') | Set-Content ${_rc_file}\""
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-add_custom_target(generate_import_lib
-  DEPENDS
-  ReliableCollectionRuntime
 )
 
 add_subdirectory(crates/samples/kvstore)
