@@ -57,9 +57,16 @@ find_program (
     REQUIRED
 )
 
+set(_rc_file ${CMAKE_CURRENT_SOURCE_DIR}/crates/fabric/c/src/Microsoft/ServiceFabric/ReliableCollectionRuntime/mod.rs)
 add_custom_target(generate_rust
   COMMAND ${cargo_exe} run -p tools_api
+  COMMAND powershell -Command "\"(Get-Content ${_rc_file}).Replace('\\\"reliablecollectionruntime\\\"','\\\"ReliableCollectionRuntime\\\"') | Set-Content ${_rc_file}\""
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(generate_import_lib
+  DEPENDS
+  ReliableCollectionRuntime
 )
 
 add_subdirectory(crates/samples/kvstore)

@@ -16,5 +16,9 @@ fn main() {
             "cargo:rustc-link-search=native={}",
             Path::new(&abs_dir).display()
         );
+    } else if cfg!(unix) {
+        // Add link dir for fabric libs on linux.
+        let dir = String::from("/opt/microsoft/servicefabric/bin/Fabric/Fabric.Code/");
+        println!("cargo:rustc-link-search={}", Path::new(&dir).display());
     }
 }

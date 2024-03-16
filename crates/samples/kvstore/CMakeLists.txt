@@ -1,13 +1,22 @@
 #proto
 message(STATUS "fetching protoc")
 include(FetchContent)
-FetchContent_Declare(
-  protoc
-  DOWNLOAD_NO_EXTRACT FALSE
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  URL https://github.com/protocolbuffers/protobuf/releases/download/v24.1/protoc-24.1-win64.zip
-  URL_HASH SHA256=DAD1EFED75CB772A0C9E5D4646006BF87E1E051191473A2A30C9DB66EE223CFD
-)
+if(WIN32)
+  FetchContent_Declare(
+    protoc
+    DOWNLOAD_NO_EXTRACT FALSE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/protocolbuffers/protobuf/releases/download/v24.1/protoc-24.1-win64.zip
+    URL_HASH SHA256=DAD1EFED75CB772A0C9E5D4646006BF87E1E051191473A2A30C9DB66EE223CFD
+  )
+else(WIN32)
+  FetchContent_Declare(
+    protoc
+    DOWNLOAD_NO_EXTRACT FALSE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
+  )
+endif(WIN32)
 FetchContent_GetProperties(protoc)
 if(NOT protoc_POPULATED)
   FetchContent_Populate(protoc)
@@ -19,7 +28,6 @@ endif()
 add_custom_target(build_rust_sample_kvstore ALL
     COMMAND ${cargo_exe} build -p kvstore
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    DEPENDS build_fabric_rust_pal
 )
 
 set(_pkg_root ${CMAKE_BINARY_DIR}/kvstore_root)

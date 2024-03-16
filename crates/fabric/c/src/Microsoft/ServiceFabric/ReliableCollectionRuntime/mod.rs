@@ -1,7 +1,7 @@
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Buffer_Release(handle: *mut ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Buffer_Release(handle: *mut ::core::ffi::c_void) -> ();
     }
@@ -10,7 +10,7 @@ pub unsafe fn Buffer_Release(handle: *mut ::core::ffi::c_void) {
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn CancellationTokenSource_Cancel(cts: *mut ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn CancellationTokenSource_Cancel(cts: *mut ::core::ffi::c_void) -> ();
     }
@@ -19,7 +19,7 @@ pub unsafe fn CancellationTokenSource_Cancel(cts: *mut ::core::ffi::c_void) {
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn CancellationTokenSource_Release(cts: *mut ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn CancellationTokenSource_Release(cts: *mut ::core::ffi::c_void) -> ();
     }
@@ -40,7 +40,7 @@ pub unsafe fn ConcurrentQueue_EnqueueAsync(
     ctx: *const ::core::ffi::c_void,
     synchronouscomplete: *mut ::windows::Win32::Foundation::BOOL,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn ConcurrentQueue_EnqueueAsync(
             concurrentqueue: *const ::core::ffi::c_void,
@@ -74,7 +74,7 @@ pub unsafe fn ConcurrentQueue_EnqueueAsync(
 pub unsafe fn ConcurrentQueue_GetCount(
     concurrentqueue: *const ::core::ffi::c_void,
 ) -> ::windows_core::Result<i64> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn ConcurrentQueue_GetCount(
             concurrentqueue: *const ::core::ffi::c_void,
@@ -99,7 +99,7 @@ pub unsafe fn ConcurrentQueue_TryDequeueAsync(
     ctx: *const ::core::ffi::c_void,
     synchronouscomplete: *mut ::windows::Win32::Foundation::BOOL,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn ConcurrentQueue_TryDequeueAsync(
             concurrentqueue: *const ::core::ffi::c_void,
@@ -147,7 +147,7 @@ where
     P1: ::windows_core::IntoParam<::windows_core::PCWSTR>,
     P2: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn GetTxnReplicator(
             replicaid: i64,
@@ -181,7 +181,7 @@ pub unsafe fn PrimaryReplicator_UpdateReplicatorSettings(
     primaryreplicator: *const ::core::ffi::c_void,
     replicatorsettings: *const TxnReplicator_Settings,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn PrimaryReplicator_UpdateReplicatorSettings(
             primaryreplicator: *const ::core::ffi::c_void,
@@ -193,7 +193,7 @@ pub unsafe fn PrimaryReplicator_UpdateReplicatorSettings(
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn ReliableCollectionRuntime_Initialize(apiversion: u16) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn ReliableCollectionRuntime_Initialize(apiversion: u16) -> ::windows_core::HRESULT;
     }
@@ -209,7 +209,7 @@ pub unsafe fn ReliableCollectionRuntime_Initialize2<P0>(
 where
     P0: ::windows_core::IntoParam<::windows::Win32::Foundation::BOOL>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn ReliableCollectionRuntime_Initialize2(
             apiversion: u16,
@@ -221,7 +221,7 @@ where
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn ReliableCollectionRuntime_StartTraceSessions() -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn ReliableCollectionRuntime_StartTraceSessions() -> ::windows_core::HRESULT;
     }
@@ -230,7 +230,7 @@ pub unsafe fn ReliableCollectionRuntime_StartTraceSessions() -> ::windows_core::
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProviderEnumerator_AddRef(enumerator: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StateProviderEnumerator_AddRef(enumerator: *const ::core::ffi::c_void) -> ();
     }
@@ -245,7 +245,7 @@ pub unsafe fn StateProviderEnumerator_MoveNext(
     providername: *mut ::windows_core::PCWSTR,
     provider: *mut *mut ::core::ffi::c_void,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StateProviderEnumerator_MoveNext(
             enumerator: *const ::core::ffi::c_void,
@@ -259,7 +259,7 @@ pub unsafe fn StateProviderEnumerator_MoveNext(
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProviderEnumerator_Release(enumerator: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StateProviderEnumerator_Release(enumerator: *const ::core::ffi::c_void) -> ();
     }
@@ -268,7 +268,7 @@ pub unsafe fn StateProviderEnumerator_Release(enumerator: *const ::core::ffi::c_
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProvider_AddRef(stateproviderhandle: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StateProvider_AddRef(stateproviderhandle: *const ::core::ffi::c_void) -> ();
     }
@@ -283,7 +283,7 @@ pub unsafe fn StateProvider_GetInfo<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StateProvider_GetInfo(
             stateprovider: *const ::core::ffi::c_void,
@@ -297,7 +297,7 @@ where
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProvider_Release(stateproviderhandle: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StateProvider_Release(stateproviderhandle: *const ::core::ffi::c_void) -> ();
     }
@@ -306,7 +306,7 @@ pub unsafe fn StateProvider_Release(stateproviderhandle: *const ::core::ffi::c_v
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StoreKeyEnumerator_AddRef(enumerator: *mut ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StoreKeyEnumerator_AddRef(enumerator: *mut ::core::ffi::c_void) -> ();
     }
@@ -320,7 +320,7 @@ pub unsafe fn StoreKeyEnumerator_MoveNext(
     advanced: *mut ::windows::Win32::Foundation::BOOL,
     key: *mut ::windows_core::PCWSTR,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StoreKeyEnumerator_MoveNext(
             enumerator: *const ::core::ffi::c_void,
@@ -333,7 +333,7 @@ pub unsafe fn StoreKeyEnumerator_MoveNext(
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StoreKeyEnumerator_Release(enumerator: *mut ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StoreKeyEnumerator_Release(enumerator: *mut ::core::ffi::c_void) -> ();
     }
@@ -354,7 +354,7 @@ pub unsafe fn StoreKeyValueEnumerator_MoveNextAsync(
     ctx: *const ::core::ffi::c_void,
     synchronouscomplete: *mut ::windows::Win32::Foundation::BOOL,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StoreKeyValueEnumerator_MoveNextAsync(
             enumerator: *const ::core::ffi::c_void,
@@ -386,7 +386,7 @@ pub unsafe fn StoreKeyValueEnumerator_MoveNextAsync(
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StoreKeyValueEnumerator_Release(enumerator: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn StoreKeyValueEnumerator_Release(enumerator: *const ::core::ffi::c_void) -> ();
     }
@@ -411,7 +411,7 @@ pub unsafe fn Store_AddAsync<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_AddAsync(
             store: *const ::core::ffi::c_void,
@@ -445,7 +445,7 @@ where
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_AddRef(storehandle: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_AddRef(storehandle: *const ::core::ffi::c_void) -> ();
     }
@@ -472,7 +472,7 @@ pub unsafe fn Store_ConditionalGetAsync<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_ConditionalGetAsync(
             store: *const ::core::ffi::c_void,
@@ -525,7 +525,7 @@ pub unsafe fn Store_ConditionalRemoveAsync<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_ConditionalRemoveAsync(
             store: *const ::core::ffi::c_void,
@@ -575,7 +575,7 @@ pub unsafe fn Store_ConditionalUpdateAsync<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_ConditionalUpdateAsync(
             store: *const ::core::ffi::c_void,
@@ -628,7 +628,7 @@ pub unsafe fn Store_ContainsKeyAsync<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_ContainsKeyAsync(
             store: *const ::core::ffi::c_void,
@@ -668,7 +668,7 @@ pub unsafe fn Store_CreateEnumeratorAsync(
     ctx: *const ::core::ffi::c_void,
     synchronouscomplete: *mut ::windows::Win32::Foundation::BOOL,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_CreateEnumeratorAsync(
             store: *const ::core::ffi::c_void,
@@ -698,7 +698,7 @@ where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
     P1: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_CreateKeyEnumeratorAsync(
             store: *const ::core::ffi::c_void,
@@ -740,7 +740,7 @@ where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
     P1: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_CreateRangedEnumeratorAsync(
             store: *const ::core::ffi::c_void,
@@ -768,7 +768,7 @@ where
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_GetCount(store: *const ::core::ffi::c_void) -> ::windows_core::Result<i64> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_GetCount(
             store: *const ::core::ffi::c_void,
@@ -781,7 +781,7 @@ pub unsafe fn Store_GetCount(store: *const ::core::ffi::c_void) -> ::windows_cor
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_Release(storehandle: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_Release(storehandle: *const ::core::ffi::c_void) -> ();
     }
@@ -795,7 +795,7 @@ pub unsafe fn Store_SetNotifyStoreChangeCallback(
     cleanupcallback: fnCleanupContextCallback,
     ctx: *const ::core::ffi::c_void,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_SetNotifyStoreChangeCallback(
             stateprovider: *const ::core::ffi::c_void,
@@ -812,7 +812,7 @@ pub unsafe fn Store_SetNotifyStoreChangeCallbackMask(
     stateproviderhandle: *const ::core::ffi::c_void,
     mask: NotifyStoreChangeCallbackMask,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Store_SetNotifyStoreChangeCallbackMask(
             stateproviderhandle: *const ::core::ffi::c_void,
@@ -828,7 +828,7 @@ pub unsafe fn Test_UseEnv<P0>(enable: P0)
 where
     P0: ::windows_core::IntoParam<::windows::Win32::Foundation::BOOL>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Test_UseEnv(enable: ::windows::Win32::Foundation::BOOL) -> ();
     }
@@ -837,7 +837,7 @@ where
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_Abort(txn: *const ::core::ffi::c_void) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Transaction_Abort(txn: *const ::core::ffi::c_void) -> ::windows_core::HRESULT;
     }
@@ -846,7 +846,7 @@ pub unsafe fn Transaction_Abort(txn: *const ::core::ffi::c_void) -> ::windows_co
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_AddRef(txn: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Transaction_AddRef(txn: *const ::core::ffi::c_void) -> ();
     }
@@ -860,7 +860,7 @@ pub unsafe fn Transaction_CommitAsync(
     callback: fnNotifyAsyncCompletion,
     ctx: *const ::core::ffi::c_void,
 ) -> ::windows_core::Result<::windows::Win32::Foundation::BOOL> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Transaction_CommitAsync(
             txn: *const ::core::ffi::c_void,
@@ -875,7 +875,7 @@ pub unsafe fn Transaction_CommitAsync(
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_Dispose(txn: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Transaction_Dispose(txn: *const ::core::ffi::c_void) -> ();
     }
@@ -887,7 +887,7 @@ pub unsafe fn Transaction_GetInfo(
     txnhandle: *const ::core::ffi::c_void,
     info: *mut Transaction_Info,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Transaction_GetInfo(
             txnhandle: *const ::core::ffi::c_void,
@@ -906,7 +906,7 @@ pub unsafe fn Transaction_GetVisibilitySequenceNumberAsync(
     ctx: *const ::core::ffi::c_void,
     synchronouscomplete: *mut ::windows::Win32::Foundation::BOOL,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Transaction_GetVisibilitySequenceNumberAsync(
             txnhandle: *const ::core::ffi::c_void,
@@ -928,7 +928,7 @@ pub unsafe fn Transaction_GetVisibilitySequenceNumberAsync(
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_Release(txn: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn Transaction_Release(txn: *const ::core::ffi::c_void) -> ();
     }
@@ -953,7 +953,7 @@ where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
     P1: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_AddStateProviderAsync(
             txnreplicator: *const ::core::ffi::c_void,
@@ -995,7 +995,7 @@ pub unsafe fn TxnReplicator_BackupAsync(
     ctx: *const ::core::ffi::c_void,
     synchronouscomplete: *mut ::windows::Win32::Foundation::BOOL,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_BackupAsync(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1033,7 +1033,7 @@ pub unsafe fn TxnReplicator_BackupAsync2(
     ctx: *const ::core::ffi::c_void,
     synchronouscomplete: *mut ::windows::Win32::Foundation::BOOL,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_BackupAsync2(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1069,7 +1069,7 @@ pub unsafe fn TxnReplicator_CreateEnumerator<P0>(
 where
     P0: ::windows_core::IntoParam<::windows::Win32::Foundation::BOOL>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_CreateEnumerator(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1085,7 +1085,7 @@ pub unsafe fn TxnReplicator_CreateTransaction(
     txnreplicator: *const ::core::ffi::c_void,
     txn: *mut *mut ::core::ffi::c_void,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_CreateTransaction(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1100,7 +1100,7 @@ pub unsafe fn TxnReplicator_GetInfo(
     txnreplicator: *const ::core::ffi::c_void,
     info: *mut TxnReplicator_Info,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_GetInfo(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1130,7 +1130,7 @@ where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
     P1: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_GetOrAddStateProviderAsync(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1173,7 +1173,7 @@ pub unsafe fn TxnReplicator_GetStateProvider<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_GetStateProvider(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1186,7 +1186,7 @@ where
 #[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn TxnReplicator_Release(txnreplicator: *const ::core::ffi::c_void) {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_Release(txnreplicator: *const ::core::ffi::c_void) -> ();
     }
@@ -1208,7 +1208,7 @@ pub unsafe fn TxnReplicator_RemoveStateProviderAsync<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_RemoveStateProviderAsync(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1249,7 +1249,7 @@ pub unsafe fn TxnReplicator_RestoreAsync<P0>(
 where
     P0: ::windows_core::IntoParam<::windows_core::PCWSTR>,
 {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_RestoreAsync(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1282,7 +1282,7 @@ pub unsafe fn TxnReplicator_SetNotifyStateManagerChangeCallback(
     cleanupcallback: fnCleanupContextCallback,
     ctx: *const ::core::ffi::c_void,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_SetNotifyStateManagerChangeCallback(
             txnreplicator: *const ::core::ffi::c_void,
@@ -1302,7 +1302,7 @@ pub unsafe fn TxnReplicator_SetNotifyTransactionChangeCallback(
     cleanupcallback: fnCleanupContextCallback,
     ctx: *const ::core::ffi::c_void,
 ) -> ::windows_core::Result<()> {
-    #[link(name = "reliablecollectionruntime")]
+    #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
         pub fn TxnReplicator_SetNotifyTransactionChangeCallback(
             txnreplicator: *const ::core::ffi::c_void,

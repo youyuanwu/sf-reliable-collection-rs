@@ -13,7 +13,8 @@ use std::{
 use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     IFabricDataLossHandler, TxnReplicator_Settings,
 };
-use fabric_rs::runtime::{
+use log::info;
+use mssf_core::runtime::{
     executor::{DefaultExecutor, Executor},
     stateful::{
         PrimaryReplicator, StatefulServiceFactory, StatefulServicePartition, StatefulServiceReplica,
@@ -21,7 +22,6 @@ use fabric_rs::runtime::{
     stateful_proxy::PrimaryReplicatorProxy,
     stateful_types::{OpenMode, Role},
 };
-use log::info;
 use reliable_collection::wrap::{get_txn_replicator, TxnReplicaReplicator};
 use tokio::sync::oneshot::{self, Sender};
 use tonic::transport::Server;

@@ -18,8 +18,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .parent()
         .unwrap();
     let mut exe = abs_dir.to_path_buf();
-    exe.push("build/_deps/protoc-src/bin/protoc.exe");
-
+    if cfg!(windows) {
+        exe.push("build/_deps/protoc-src/bin/protoc.exe");
+    } else {
+        exe.push("build/_deps/protoc-src/bin/protoc");
+    }
     std::env::set_var("PROTOC", exe);
     // generate kvstore for grpc
     tonic_build::compile_protos("proto/kvstore.proto")?;

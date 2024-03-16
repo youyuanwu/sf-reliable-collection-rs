@@ -12,9 +12,8 @@ features = [
   "Win32_Foundation"
 ]
 
-[dependencies.fabric_base]
-git = "https://github.com/youyuanwu/service-fabric-rs.git"
-rev = "e2a2cd4a4019317061d1fdb043c322719f21399e"
+[dependencies.mssf-com]
+version = "*"
 features = [
     "implement",
     "ServiceFabric_FabricCommon",
