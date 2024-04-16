@@ -32,12 +32,12 @@ features = [
 [dependencies.mssf-core]
 version = "*"
 
-[dependencies.reliable_collection]
-path = "../../fabric/reliable_collection"
+[dependencies.sfrc-core]
+path = "../../libs/core"
 
 
-[dependencies.fabric_c]
-path = "../../fabric/c"
+[dependencies.sfrc-c]
+path = "../../libs/c"
 features = ["implement"]
 
 [build-dependencies]

@@ -119,9 +119,9 @@ jobs:
     
     - name: provision app
       run: |
-        sleep 120 # wait for cluster to be up
+        sleep 30 # wait for cluster to be up
         bash ./scripts/kvstore_ctl.sh -a add
-        sleep 300s
+        sleep 30s
         sfctl service health --service-id KvStore/KvStoreService
         # sfctl service resolve --service-id KvStore/KvStoreService
     # TODO: cannot resolve in ci

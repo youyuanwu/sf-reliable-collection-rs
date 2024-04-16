@@ -7,7 +7,10 @@
 use core::slice;
 use std::{ffi::c_void, ptr::addr_of_mut};
 
-use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
+use mssf_com::FabricCommon::FabricRuntime::{
+    IFabricPrimaryReplicator, IFabricStatefulServicePartition,
+};
+use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     fnNotifyAsyncCompletion, fnNotifyCreateEnumeratorAsyncCompletion, fnNotifyGetAsyncCompletion,
     fnNotifyGetOrAddStateProviderAsyncCompletion, fnNotifyRemoveAsyncCompletion,
     fnNotifyStoreKeyValueEnumeratorMoveNextAsyncCompletion, Buffer, Buffer_Release,
@@ -21,9 +24,6 @@ use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     TxnReplicator_CreateTransaction, TxnReplicator_GetInfo,
     TxnReplicator_GetOrAddStateProviderAsync, TxnReplicator_Info, TxnReplicator_Release,
     TxnReplicator_Settings, RELIABLECOLLECTION_API_VERSION,
-};
-use mssf_com::FabricCommon::FabricRuntime::{
-    IFabricPrimaryReplicator, IFabricStatefulServicePartition,
 };
 use tokio::sync::oneshot::{self, Receiver, Sender};
 use windows::{

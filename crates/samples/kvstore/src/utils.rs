@@ -4,11 +4,11 @@
 // license information.
 // ------------------------------------------------------------
 
-use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
-    IFabricDataLossHandler, IFabricDataLossHandler_Impl,
-};
 use mssf_com::FabricCommon::{IFabricAsyncOperationCallback, IFabricAsyncOperationContext};
 use mssf_core::AsyncContext;
+use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
+    IFabricDataLossHandler, IFabricDataLossHandler_Impl,
+};
 use windows::core::implement;
 use windows_core::Interface;
 

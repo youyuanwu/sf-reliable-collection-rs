@@ -321,14 +321,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fabric_c"
-version = "0.0.0"
-dependencies = [
- "windows",
- "windows-core",
-]
-
-[[package]]
 name = "fastrand"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -582,13 +574,13 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "env_logger 0.11.3",
- "fabric_c",
  "log",
  "mssf-com",
  "mssf-core",
  "prost",
  "prost-build",
- "reliable_collection",
+ "sfrc-c",
+ "sfrc-core",
  "tokio",
  "tonic",
  "tonic-build",
@@ -997,16 +989,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
-name = "reliable_collection"
-version = "0.1.0"
-dependencies = [
- "fabric_c",
- "mssf-com",
- "tokio",
- "windows",
-]
-
-[[package]]
 name = "rustc-demangle"
 version = "0.1.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1055,6 +1037,24 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "sfrc-c"
+version = "0.0.0"
+dependencies = [
+ "windows",
+ "windows-core",
+]
+
+[[package]]
+name = "sfrc-core"
+version = "0.1.0"
+dependencies = [
+ "mssf-com",
+ "sfrc-c",
+ "tokio",
+ "windows",
 ]
 
 [[package]]

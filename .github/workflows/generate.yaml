@@ -1,0 +1,38 @@
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        BUILD_TYPE: ["Debug"]
+        os: [ windows-latest ]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Get specific version CMake, v3.21.2
+      uses: lukka/get-cmake@v3.21.2
+
+    - name: Install rust stable
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    - name: cmake configure
+      run: > 
+        cmake . -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -B build
+
+    - name: remove generated c wrapper code
+      run: cmake --build build --config ${{ matrix.BUILD_TYPE }} --target force_clean
+
+    - name: generate rust code
+      run: cmake --build build --config ${{ matrix.BUILD_TYPE }} --target generate_rust
+
+    - name: check all generated files are checked in git
+      run: git diff --exit-code -- '***.rs'
+
+    - name: build rust code
+      run: cmake --build build --config ${{ matrix.BUILD_TYPE }}

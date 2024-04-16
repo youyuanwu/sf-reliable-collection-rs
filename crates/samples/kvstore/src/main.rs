@@ -12,7 +12,7 @@ use mssf_core::{
         ActivationContext,
     },
 };
-use reliable_collection::wrap::ReliableCollectionRuntime;
+use sfrc_core::wrap::ReliableCollectionRuntime;
 use windows_core::HSTRING;
 
 use crate::kvstore::Factory;

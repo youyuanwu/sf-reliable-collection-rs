@@ -10,9 +10,6 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
-    IFabricDataLossHandler, TxnReplicator_Settings,
-};
 use log::info;
 use mssf_core::runtime::{
     executor::{DefaultExecutor, Executor},
@@ -22,7 +19,10 @@ use mssf_core::runtime::{
     stateful_proxy::PrimaryReplicatorProxy,
     stateful_types::{OpenMode, Role},
 };
-use reliable_collection::wrap::{get_txn_replicator, TxnReplicaReplicator};
+use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
+    IFabricDataLossHandler, TxnReplicator_Settings,
+};
+use sfrc_core::wrap::{get_txn_replicator, TxnReplicaReplicator};
 use tokio::sync::oneshot::{self, Sender};
 use tonic::transport::Server;
 use windows_core::{Error, HSTRING};
@@ -210,11 +210,11 @@ pub mod rpc {
     use std::sync::Arc;
 
     use async_trait::async_trait;
-    use fabric_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
+    use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
         StateProvider_Info, StateProvider_Info_V1_Size, StateProvider_Kind_Store,
         Store_LockMode_Exclusive,
     };
-    use reliable_collection::wrap::{StateProvider, TxnReplicaReplicator};
+    use sfrc_core::wrap::{StateProvider, TxnReplicaReplicator};
     use windows::Win32::Foundation::ERROR_NOT_FOUND;
     use windows_core::{Error, HSTRING, PCWSTR};
 
