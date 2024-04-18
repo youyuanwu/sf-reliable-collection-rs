@@ -9,19 +9,19 @@ edition = "2021"
 log = "*"
 env_logger = "*"
 tokio = { version = "1", features = ["full"] }
-windows-core = "0.51"
+windows-core = "0.54"
 async-trait = "*" # needed by tonic
 tonic = "*"
 prost = "*"
 
 [dependencies.windows]
-version = "0.51"
+version = "0.54"
 features = [
     "implement"
 ]
 
 [dependencies.mssf-com]
-version = "*"
+version = "0.0.3"
 features = [
     "implement",
     "ServiceFabric_FabricCommon",
@@ -30,7 +30,7 @@ features = [
 ]
 
 [dependencies.mssf-core]
-version = "*"
+version = "0.0.3"
 
 [dependencies.sfrc-core]
 path = "../../libs/core"

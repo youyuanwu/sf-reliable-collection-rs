@@ -1,31 +1,27 @@
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Buffer_Release(handle: *mut ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn Buffer_Release(handle: *mut ::core::ffi::c_void) -> ();
+        pub fn Buffer_Release(handle: *mut ::core::ffi::c_void);
     }
     Buffer_Release(handle)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn CancellationTokenSource_Cancel(cts: *mut ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn CancellationTokenSource_Cancel(cts: *mut ::core::ffi::c_void) -> ();
+        pub fn CancellationTokenSource_Cancel(cts: *mut ::core::ffi::c_void);
     }
     CancellationTokenSource_Cancel(cts)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn CancellationTokenSource_Release(cts: *mut ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn CancellationTokenSource_Release(cts: *mut ::core::ffi::c_void) -> ();
+        pub fn CancellationTokenSource_Release(cts: *mut ::core::ffi::c_void);
     }
     CancellationTokenSource_Release(cts)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn ConcurrentQueue_EnqueueAsync(
@@ -69,7 +65,6 @@ pub unsafe fn ConcurrentQueue_EnqueueAsync(
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn ConcurrentQueue_GetCount(
     concurrentqueue: *const ::core::ffi::c_void,
@@ -82,9 +77,8 @@ pub unsafe fn ConcurrentQueue_GetCount(
         ) -> ::windows_core::HRESULT;
     }
     let mut result__ = ::std::mem::zeroed();
-    ConcurrentQueue_GetCount(concurrentqueue, &mut result__).from_abi(result__)
+    ConcurrentQueue_GetCount(concurrentqueue, &mut result__).map(|| result__)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn ConcurrentQueue_TryDequeueAsync(
@@ -128,7 +122,6 @@ pub unsafe fn ConcurrentQueue_TryDequeueAsync(
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn GetTxnReplicator<P0, P1, P2>(
@@ -174,7 +167,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn PrimaryReplicator_UpdateReplicatorSettings(
@@ -190,7 +182,6 @@ pub unsafe fn PrimaryReplicator_UpdateReplicatorSettings(
     }
     PrimaryReplicator_UpdateReplicatorSettings(primaryreplicator, replicatorsettings).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn ReliableCollectionRuntime_Initialize(apiversion: u16) -> ::windows_core::Result<()> {
     #[link(name = "ReliableCollectionRuntime")]
@@ -199,7 +190,6 @@ pub unsafe fn ReliableCollectionRuntime_Initialize(apiversion: u16) -> ::windows
     }
     ReliableCollectionRuntime_Initialize(apiversion).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn ReliableCollectionRuntime_Initialize2<P0>(
@@ -218,7 +208,6 @@ where
     }
     ReliableCollectionRuntime_Initialize2(apiversion, standalonemode.into_param().abi()).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn ReliableCollectionRuntime_StartTraceSessions() -> ::windows_core::Result<()> {
     #[link(name = "ReliableCollectionRuntime")]
@@ -227,16 +216,14 @@ pub unsafe fn ReliableCollectionRuntime_StartTraceSessions() -> ::windows_core::
     }
     ReliableCollectionRuntime_StartTraceSessions().ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProviderEnumerator_AddRef(enumerator: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn StateProviderEnumerator_AddRef(enumerator: *const ::core::ffi::c_void) -> ();
+        pub fn StateProviderEnumerator_AddRef(enumerator: *const ::core::ffi::c_void);
     }
     StateProviderEnumerator_AddRef(enumerator)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn StateProviderEnumerator_MoveNext(
@@ -256,25 +243,22 @@ pub unsafe fn StateProviderEnumerator_MoveNext(
     }
     StateProviderEnumerator_MoveNext(enumerator, advanced, providername, provider).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProviderEnumerator_Release(enumerator: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn StateProviderEnumerator_Release(enumerator: *const ::core::ffi::c_void) -> ();
+        pub fn StateProviderEnumerator_Release(enumerator: *const ::core::ffi::c_void);
     }
     StateProviderEnumerator_Release(enumerator)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProvider_AddRef(stateproviderhandle: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn StateProvider_AddRef(stateproviderhandle: *const ::core::ffi::c_void) -> ();
+        pub fn StateProvider_AddRef(stateproviderhandle: *const ::core::ffi::c_void);
     }
     StateProvider_AddRef(stateproviderhandle)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProvider_GetInfo<P0>(
     stateprovider: *const ::core::ffi::c_void,
@@ -292,27 +276,24 @@ where
         ) -> ::windows_core::HRESULT;
     }
     let mut result__ = ::std::mem::zeroed();
-    StateProvider_GetInfo(stateprovider, lang.into_param().abi(), &mut result__).from_abi(result__)
+    StateProvider_GetInfo(stateprovider, lang.into_param().abi(), &mut result__).map(|| result__)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StateProvider_Release(stateproviderhandle: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn StateProvider_Release(stateproviderhandle: *const ::core::ffi::c_void) -> ();
+        pub fn StateProvider_Release(stateproviderhandle: *const ::core::ffi::c_void);
     }
     StateProvider_Release(stateproviderhandle)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StoreKeyEnumerator_AddRef(enumerator: *mut ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn StoreKeyEnumerator_AddRef(enumerator: *mut ::core::ffi::c_void) -> ();
+        pub fn StoreKeyEnumerator_AddRef(enumerator: *mut ::core::ffi::c_void);
     }
     StoreKeyEnumerator_AddRef(enumerator)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn StoreKeyEnumerator_MoveNext(
@@ -330,16 +311,14 @@ pub unsafe fn StoreKeyEnumerator_MoveNext(
     }
     StoreKeyEnumerator_MoveNext(enumerator, advanced, key).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StoreKeyEnumerator_Release(enumerator: *mut ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn StoreKeyEnumerator_Release(enumerator: *mut ::core::ffi::c_void) -> ();
+        pub fn StoreKeyEnumerator_Release(enumerator: *mut ::core::ffi::c_void);
     }
     StoreKeyEnumerator_Release(enumerator)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn StoreKeyValueEnumerator_MoveNextAsync(
@@ -383,16 +362,14 @@ pub unsafe fn StoreKeyValueEnumerator_MoveNextAsync(
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn StoreKeyValueEnumerator_Release(enumerator: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn StoreKeyValueEnumerator_Release(enumerator: *const ::core::ffi::c_void) -> ();
+        pub fn StoreKeyValueEnumerator_Release(enumerator: *const ::core::ffi::c_void);
     }
     StoreKeyValueEnumerator_Release(enumerator)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_AddAsync<P0>(
@@ -442,16 +419,14 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_AddRef(storehandle: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn Store_AddRef(storehandle: *const ::core::ffi::c_void) -> ();
+        pub fn Store_AddRef(storehandle: *const ::core::ffi::c_void);
     }
     Store_AddRef(storehandle)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_ConditionalGetAsync<P0>(
@@ -507,7 +482,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_ConditionalRemoveAsync<P0>(
@@ -554,7 +528,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_ConditionalUpdateAsync<P0>(
@@ -610,7 +583,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_ContainsKeyAsync<P0>(
@@ -657,7 +629,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_CreateEnumeratorAsync(
@@ -681,7 +652,6 @@ pub unsafe fn Store_CreateEnumeratorAsync(
     }
     Store_CreateEnumeratorAsync(store, txn, enumerator, callback, ctx, synchronouscomplete).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_CreateKeyEnumeratorAsync<P0, P1>(
@@ -723,7 +693,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Store_CreateRangedEnumeratorAsync<P0, P1>(
@@ -765,7 +734,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_GetCount(store: *const ::core::ffi::c_void) -> ::windows_core::Result<i64> {
     #[link(name = "ReliableCollectionRuntime")]
@@ -776,18 +744,16 @@ pub unsafe fn Store_GetCount(store: *const ::core::ffi::c_void) -> ::windows_cor
         ) -> ::windows_core::HRESULT;
     }
     let mut result__ = ::std::mem::zeroed();
-    Store_GetCount(store, &mut result__).from_abi(result__)
+    Store_GetCount(store, &mut result__).map(|| result__)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_Release(storehandle: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn Store_Release(storehandle: *const ::core::ffi::c_void) -> ();
+        pub fn Store_Release(storehandle: *const ::core::ffi::c_void);
     }
     Store_Release(storehandle)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_SetNotifyStoreChangeCallback(
     stateprovider: *const ::core::ffi::c_void,
@@ -806,7 +772,6 @@ pub unsafe fn Store_SetNotifyStoreChangeCallback(
     }
     Store_SetNotifyStoreChangeCallback(stateprovider, callback, cleanupcallback, ctx).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Store_SetNotifyStoreChangeCallbackMask(
     stateproviderhandle: *const ::core::ffi::c_void,
@@ -821,7 +786,6 @@ pub unsafe fn Store_SetNotifyStoreChangeCallbackMask(
     }
     Store_SetNotifyStoreChangeCallbackMask(stateproviderhandle, mask).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Test_UseEnv<P0>(enable: P0)
@@ -830,11 +794,10 @@ where
 {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn Test_UseEnv(enable: ::windows::Win32::Foundation::BOOL) -> ();
+        pub fn Test_UseEnv(enable: ::windows::Win32::Foundation::BOOL);
     }
     Test_UseEnv(enable.into_param().abi())
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_Abort(txn: *const ::core::ffi::c_void) -> ::windows_core::Result<()> {
     #[link(name = "ReliableCollectionRuntime")]
@@ -843,16 +806,14 @@ pub unsafe fn Transaction_Abort(txn: *const ::core::ffi::c_void) -> ::windows_co
     }
     Transaction_Abort(txn).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_AddRef(txn: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn Transaction_AddRef(txn: *const ::core::ffi::c_void) -> ();
+        pub fn Transaction_AddRef(txn: *const ::core::ffi::c_void);
     }
     Transaction_AddRef(txn)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Transaction_CommitAsync(
@@ -870,18 +831,16 @@ pub unsafe fn Transaction_CommitAsync(
         ) -> ::windows_core::HRESULT;
     }
     let mut result__ = ::std::mem::zeroed();
-    Transaction_CommitAsync(txn, callback, ctx, &mut result__).from_abi(result__)
+    Transaction_CommitAsync(txn, callback, ctx, &mut result__).map(|| result__)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_Dispose(txn: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn Transaction_Dispose(txn: *const ::core::ffi::c_void) -> ();
+        pub fn Transaction_Dispose(txn: *const ::core::ffi::c_void);
     }
     Transaction_Dispose(txn)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_GetInfo(
     txnhandle: *const ::core::ffi::c_void,
@@ -896,7 +855,6 @@ pub unsafe fn Transaction_GetInfo(
     }
     Transaction_GetInfo(txnhandle, info).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn Transaction_GetVisibilitySequenceNumberAsync(
@@ -925,16 +883,14 @@ pub unsafe fn Transaction_GetVisibilitySequenceNumberAsync(
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn Transaction_Release(txn: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn Transaction_Release(txn: *const ::core::ffi::c_void) -> ();
+        pub fn Transaction_Release(txn: *const ::core::ffi::c_void);
     }
     Transaction_Release(txn)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn TxnReplicator_AddStateProviderAsync<P0, P1>(
@@ -982,7 +938,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn TxnReplicator_BackupAsync(
@@ -1020,7 +975,6 @@ pub unsafe fn TxnReplicator_BackupAsync(
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn TxnReplicator_BackupAsync2(
@@ -1058,7 +1012,6 @@ pub unsafe fn TxnReplicator_BackupAsync2(
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn TxnReplicator_CreateEnumerator<P0>(
@@ -1079,7 +1032,6 @@ where
     }
     TxnReplicator_CreateEnumerator(txnreplicator, parentsonly.into_param().abi(), enumerator).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn TxnReplicator_CreateTransaction(
     txnreplicator: *const ::core::ffi::c_void,
@@ -1094,7 +1046,6 @@ pub unsafe fn TxnReplicator_CreateTransaction(
     }
     TxnReplicator_CreateTransaction(txnreplicator, txn).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn TxnReplicator_GetInfo(
     txnreplicator: *const ::core::ffi::c_void,
@@ -1109,7 +1060,6 @@ pub unsafe fn TxnReplicator_GetInfo(
     }
     TxnReplicator_GetInfo(txnreplicator, info).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn TxnReplicator_GetOrAddStateProviderAsync<P0, P1>(
@@ -1163,7 +1113,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn TxnReplicator_GetStateProvider<P0>(
     txnreplicator: *const ::core::ffi::c_void,
@@ -1183,16 +1132,14 @@ where
     }
     TxnReplicator_GetStateProvider(txnreplicator, name.into_param().abi(), store).ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn TxnReplicator_Release(txnreplicator: *const ::core::ffi::c_void) {
     #[link(name = "ReliableCollectionRuntime")]
     extern "system" {
-        pub fn TxnReplicator_Release(txnreplicator: *const ::core::ffi::c_void) -> ();
+        pub fn TxnReplicator_Release(txnreplicator: *const ::core::ffi::c_void);
     }
     TxnReplicator_Release(txnreplicator)
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn TxnReplicator_RemoveStateProviderAsync<P0>(
@@ -1233,7 +1180,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 #[inline]
 pub unsafe fn TxnReplicator_RestoreAsync<P0>(
@@ -1274,7 +1220,6 @@ where
     )
     .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn TxnReplicator_SetNotifyStateManagerChangeCallback(
     txnreplicator: *const ::core::ffi::c_void,
@@ -1294,7 +1239,6 @@ pub unsafe fn TxnReplicator_SetNotifyStateManagerChangeCallback(
     TxnReplicator_SetNotifyStateManagerChangeCallback(txnreplicator, callback, cleanupcallback, ctx)
         .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[inline]
 pub unsafe fn TxnReplicator_SetNotifyTransactionChangeCallback(
     txnreplicator: *const ::core::ffi::c_void,
@@ -1314,9 +1258,12 @@ pub unsafe fn TxnReplicator_SetNotifyTransactionChangeCallback(
     TxnReplicator_SetNotifyTransactionChangeCallback(txnreplicator, callback, cleanupcallback, ctx)
         .ok()
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
-#[repr(transparent)]
-pub struct IFabricDataLossHandler(::windows_core::IUnknown);
+::windows_core::imp::com_interface!(
+    IFabricDataLossHandler,
+    IFabricDataLossHandler_Vtbl,
+    0x0bba0a6a_8f00_41b5_9bbf_3ee30357028d
+);
+::windows_core::imp::interface_hierarchy!(IFabricDataLossHandler, ::windows_core::IUnknown);
 impl IFabricDataLossHandler {
     pub unsafe fn BeginOnDataLoss(
         &self,
@@ -1343,204 +1290,110 @@ impl IFabricDataLossHandler {
         .ok()
     }
 }
-::windows_core::imp::interface_hierarchy!(IFabricDataLossHandler, ::windows_core::IUnknown);
-impl ::core::cmp::PartialEq for IFabricDataLossHandler {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-impl ::core::cmp::Eq for IFabricDataLossHandler {}
-impl ::core::fmt::Debug for IFabricDataLossHandler {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        f.debug_tuple("IFabricDataLossHandler")
-            .field(&self.0)
-            .finish()
-    }
-}
-unsafe impl ::windows_core::Interface for IFabricDataLossHandler {
-    type Vtable = IFabricDataLossHandler_Vtbl;
-}
-impl ::core::clone::Clone for IFabricDataLossHandler {
-    fn clone(&self) -> Self {
-        Self(self.0.clone())
-    }
-}
-unsafe impl ::windows_core::ComInterface for IFabricDataLossHandler {
-    const IID: ::windows_core::GUID =
-        ::windows_core::GUID::from_u128(0x0bba0a6a_8f00_41b5_9bbf_3ee30357028d);
-}
 #[repr(C)]
-#[doc(hidden)]
 pub struct IFabricDataLossHandler_Vtbl {
     pub base__: ::windows_core::IUnknown_Vtbl,
     pub BeginOnDataLoss: unsafe extern "system" fn(
-        this: *mut ::core::ffi::c_void,
-        callback: *mut ::core::ffi::c_void,
-        context: *mut *mut ::core::ffi::c_void,
+        *mut ::core::ffi::c_void,
+        *mut ::core::ffi::c_void,
+        *mut *mut ::core::ffi::c_void,
     ) -> ::windows_core::HRESULT,
     pub EndOnDataLoss: unsafe extern "system" fn(
-        this: *mut ::core::ffi::c_void,
-        context: *mut ::core::ffi::c_void,
-        isstatechanged: *mut u8,
+        *mut ::core::ffi::c_void,
+        *mut ::core::ffi::c_void,
+        *mut u8,
     ) -> ::windows_core::HRESULT,
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Add: NotifyStoreChangeCallbackMask = NotifyStoreChangeCallbackMask(1u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Backup_Option_Full: Backup_Option = Backup_Option(1u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Backup_Option_Incremental: Backup_Option = Backup_Option(2u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Backup_Option_Invalid: Backup_Option = Backup_Option(0u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const BatchAcknowledgementInterval: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(2u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const CheckpointThreshold: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(1048576u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Clear: NotifyStoreChangeCallbackMask = NotifyStoreChangeCallbackMask(8u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const InitialCopyQueueSize: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(8u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const InitialPrimaryReplicationQueueSize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(256u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const InitialSecondaryReplicationQueueSize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(2048u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxAccumulatedBackupLogSize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(2097152u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxCopyQueueSize: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(16u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxMetadataSize: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(131072u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxPrimaryReplicationQueueMemorySize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(1024u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxPrimaryReplicationQueueSize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(512u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxRecordSize: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(262144u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxReplicationMessageSize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(128u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxSecondaryReplicationQueueMemorySize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(8192u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxSecondaryReplicationQueueSize: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(4096u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxStreamSize: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(65536u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MaxWriteQueueDepth: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(524288u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const MinLogSize: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(33554432u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const None: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(0u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const OptimizeForLocalSSD: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(4194304u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const OptimizeLogForLowerDiskUsage: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(8388608u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const RELIABLECOLLECTION_API_VERSION: u32 = 256u32;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Rebuild: NotifyStoreChangeCallbackMask = NotifyStoreChangeCallbackMask(16u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Remove: NotifyStoreChangeCallbackMask = NotifyStoreChangeCallbackMask(4u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const ReplicatorAddress: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(4u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const ReplicatorListenAddress: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(16384u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const ReplicatorPublishAddress: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(32768u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Restore_Policy_Invalid: Restore_Policy = Restore_Policy(0u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Restore_Policy_Safe: Restore_Policy = Restore_Policy(1u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Restore_policy_Force: Restore_Policy = Restore_Policy(2u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const RetryInterval: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(1u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const SecondaryClearAcknowledgedOperations: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(64u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const SecurityCredentials: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(32u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const SharedLogId: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(268435456u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const SharedLogPath: TxnReplicator_Settings_Flags = TxnReplicator_Settings_Flags(536870912u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const SlowApiMonitoringDuration: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(16777216u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateManagerChangeKind_Add: StateManagerChangeKind = StateManagerChangeKind(0u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateManagerChangeKind_Rebuild: StateManagerChangeKind = StateManagerChangeKind(2u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateManagerChangeKind_Remove: StateManagerChangeKind = StateManagerChangeKind(1u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateProvider_Info_V1_Size: u32 = 16u32;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateProvider_Kind_ConcurrentQueue: StateProvider_Kind = StateProvider_Kind(2u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateProvider_Kind_Invalid: StateProvider_Kind = StateProvider_Kind(0u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateProvider_Kind_ReliableDictionary_Compat: StateProvider_Kind =
     StateProvider_Kind(3u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StateProvider_Kind_Store: StateProvider_Kind = StateProvider_Kind(1u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StoreChangeKind_Add: StoreChangeKind = StoreChangeKind(0u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StoreChangeKind_Clear: StoreChangeKind = StoreChangeKind(3u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StoreChangeKind_Rebuild: StoreChangeKind = StoreChangeKind(4u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StoreChangeKind_Remove: StoreChangeKind = StoreChangeKind(2u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const StoreChangeKind_Update: StoreChangeKind = StoreChangeKind(1u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Store_LockMode_Exclusive: Store_LockMode = Store_LockMode(2u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Store_LockMode_Free: Store_LockMode = Store_LockMode(0u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Store_LockMode_Shared: Store_LockMode = Store_LockMode(1u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Store_LockMode_Update: Store_LockMode = Store_LockMode(3u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const ThrottlingThresholdFactor: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(134217728u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const TransactionChangeKind_Commit: TransactionChangeKind = TransactionChangeKind(0u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const TruncationThresholdFactor: TxnReplicator_Settings_Flags =
     TxnReplicator_Settings_Flags(67108864u64);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub const Update: NotifyStoreChangeCallbackMask = NotifyStoreChangeCallbackMask(2u32);
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct Backup_Option(pub u32);
-impl ::core::marker::Copy for Backup_Option {}
-impl ::core::clone::Clone for Backup_Option {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for Backup_Option {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for Backup_Option {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1549,21 +1402,15 @@ impl ::core::fmt::Debug for Backup_Option {
         f.debug_tuple("Backup_Option").field(&self.0).finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct NotifyStoreChangeCallbackMask(pub u32);
-impl ::core::marker::Copy for NotifyStoreChangeCallbackMask {}
-impl ::core::clone::Clone for NotifyStoreChangeCallbackMask {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for NotifyStoreChangeCallbackMask {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for NotifyStoreChangeCallbackMask {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1574,21 +1421,15 @@ impl ::core::fmt::Debug for NotifyStoreChangeCallbackMask {
             .finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct Restore_Policy(pub u32);
-impl ::core::marker::Copy for Restore_Policy {}
-impl ::core::clone::Clone for Restore_Policy {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for Restore_Policy {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for Restore_Policy {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1597,21 +1438,15 @@ impl ::core::fmt::Debug for Restore_Policy {
         f.debug_tuple("Restore_Policy").field(&self.0).finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct StateManagerChangeKind(pub u32);
-impl ::core::marker::Copy for StateManagerChangeKind {}
-impl ::core::clone::Clone for StateManagerChangeKind {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for StateManagerChangeKind {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for StateManagerChangeKind {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1622,21 +1457,15 @@ impl ::core::fmt::Debug for StateManagerChangeKind {
             .finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct StateProvider_Kind(pub u32);
-impl ::core::marker::Copy for StateProvider_Kind {}
-impl ::core::clone::Clone for StateProvider_Kind {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for StateProvider_Kind {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for StateProvider_Kind {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1645,21 +1474,15 @@ impl ::core::fmt::Debug for StateProvider_Kind {
         f.debug_tuple("StateProvider_Kind").field(&self.0).finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct StoreChangeKind(pub u32);
-impl ::core::marker::Copy for StoreChangeKind {}
-impl ::core::clone::Clone for StoreChangeKind {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for StoreChangeKind {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for StoreChangeKind {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1668,21 +1491,15 @@ impl ::core::fmt::Debug for StoreChangeKind {
         f.debug_tuple("StoreChangeKind").field(&self.0).finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct Store_LockMode(pub u32);
-impl ::core::marker::Copy for Store_LockMode {}
-impl ::core::clone::Clone for Store_LockMode {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for Store_LockMode {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for Store_LockMode {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1691,21 +1508,15 @@ impl ::core::fmt::Debug for Store_LockMode {
         f.debug_tuple("Store_LockMode").field(&self.0).finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct TransactionChangeKind(pub u32);
-impl ::core::marker::Copy for TransactionChangeKind {}
-impl ::core::clone::Clone for TransactionChangeKind {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for TransactionChangeKind {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for TransactionChangeKind {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1716,21 +1527,15 @@ impl ::core::fmt::Debug for TransactionChangeKind {
             .finish()
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 #[repr(transparent)]
-#[derive(::core::cmp::PartialEq, ::core::cmp::Eq)]
+#[derive(
+    ::core::cmp::PartialEq,
+    ::core::cmp::Eq,
+    ::core::marker::Copy,
+    ::core::clone::Clone,
+    ::core::default::Default,
+)]
 pub struct TxnReplicator_Settings_Flags(pub u64);
-impl ::core::marker::Copy for TxnReplicator_Settings_Flags {}
-impl ::core::clone::Clone for TxnReplicator_Settings_Flags {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-impl ::core::default::Default for TxnReplicator_Settings_Flags {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 impl ::windows_core::TypeKind for TxnReplicator_Settings_Flags {
     type TypeKind = ::windows_core::CopyType;
 }
@@ -1742,7 +1547,6 @@ impl ::core::fmt::Debug for TxnReplicator_Settings_Flags {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct Backup_Info {
     pub backupId: ::windows_core::GUID,
     pub directoryPath: ::windows_core::PCWSTR,
@@ -1783,7 +1587,6 @@ impl ::core::default::Default for Backup_Info {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct Backup_Info2 {
     pub Size: u32,
     pub backupId: ::windows_core::GUID,
@@ -1833,7 +1636,6 @@ impl ::core::default::Default for Backup_Info2 {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct Backup_Version {
     pub epoch: Epoch,
     pub lsn: i64,
@@ -1867,7 +1669,6 @@ impl ::core::default::Default for Backup_Version {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct Buffer {
     pub Bytes: ::windows_core::PSTR,
     pub Length: u32,
@@ -1903,7 +1704,6 @@ impl ::core::default::Default for Buffer {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct Epoch {
     pub DataLossNumber: i64,
     pub ConfigurationNumber: i64,
@@ -1941,7 +1741,6 @@ impl ::core::default::Default for Epoch {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct StateManagerChangeData_Rebuild {
     pub StateProviders: *mut ::core::ffi::c_void,
 }
@@ -1973,7 +1772,6 @@ impl ::core::default::Default for StateManagerChangeData_Rebuild {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct StateManagerChangeData_SingleEntityChanged {
     pub Transaction: *mut ::core::ffi::c_void,
     pub StateProvider: *mut ::core::ffi::c_void,
@@ -2011,7 +1809,6 @@ impl ::core::default::Default for StateManagerChangeData_SingleEntityChanged {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct StateProvider_Info {
     pub Size: u32,
     pub Kind: StateProvider_Kind,
@@ -2049,7 +1846,6 @@ impl ::core::default::Default for StateProvider_Info {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct StoreChangeData_Add {
     pub CommitSequnceNumber: i64,
     pub Transaction: *mut ::core::ffi::c_void,
@@ -2093,7 +1889,6 @@ impl ::core::default::Default for StoreChangeData_Add {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct StoreChangeData_Rebuild {
     pub Enumerator: *mut ::core::ffi::c_void,
     pub Callback: fnAsyncCompletionCallback,
@@ -2122,7 +1917,6 @@ impl ::core::default::Default for StoreChangeData_Rebuild {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct StoreChangeData_Remove {
     pub CommitSequnceNumber: i64,
     pub Transaction: *mut ::core::ffi::c_void,
@@ -2160,7 +1954,6 @@ impl ::core::default::Default for StoreChangeData_Remove {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct StoreChangeData_Update {
     pub CommitSequnceNumber: i64,
     pub Transaction: *mut ::core::ffi::c_void,
@@ -2204,7 +1997,6 @@ impl ::core::default::Default for StoreChangeData_Update {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct TransactionChangeData_Commit {
     pub Transaction: *mut ::core::ffi::c_void,
 }
@@ -2236,7 +2028,6 @@ impl ::core::default::Default for TransactionChangeData_Commit {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct Transaction_Info {
     pub Size: u32,
     pub CommitSequenceNumber: i64,
@@ -2274,7 +2065,6 @@ impl ::core::default::Default for Transaction_Info {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub struct TxnReplicator_Info {
     pub Size: u32,
     pub LastStableSequenceNumber: i64,
@@ -2318,7 +2108,6 @@ impl ::core::default::Default for TxnReplicator_Info {
     }
 }
 #[repr(C)]
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub struct TxnReplicator_Settings {
     pub Flags: u64,
@@ -2485,42 +2274,35 @@ impl ::core::default::Default for TxnReplicator_Settings {
         unsafe { ::core::mem::zeroed() }
     }
 }
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub type fnAsyncCompletionCallback =
-    ::core::option::Option<unsafe extern "system" fn(ctx: *mut ::core::ffi::c_void) -> ()>;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
+    ::core::option::Option<unsafe extern "system" fn(ctx: *mut ::core::ffi::c_void)>;
 pub type fnCleanupContextCallback =
-    ::core::option::Option<unsafe extern "system" fn(ctx: *mut ::core::ffi::c_void) -> ()>;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
+    ::core::option::Option<unsafe extern "system" fn(ctx: *mut ::core::ffi::c_void)>;
 pub type fnNotifyAsyncCompletion = ::core::option::Option<
-    unsafe extern "system" fn(ctx: *mut ::core::ffi::c_void, status: ::windows_core::HRESULT) -> (),
+    unsafe extern "system" fn(ctx: *mut ::core::ffi::c_void, status: ::windows_core::HRESULT),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyContainsKeyAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         status: ::windows_core::HRESULT,
         found: ::windows::Win32::Foundation::BOOL,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub type fnNotifyCreateEnumeratorAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         status: ::windows_core::HRESULT,
         enumerator: *mut ::core::ffi::c_void,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub type fnNotifyCreateKeyEnumeratorAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         status: ::windows_core::HRESULT,
         enumerator: *mut ::core::ffi::c_void,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyGetAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
@@ -2531,9 +2313,8 @@ pub type fnNotifyGetAsyncCompletion = ::core::option::Option<
         bytes: *mut ::core::ffi::c_void,
         byteslength: u32,
         versionsequencenumber: i64,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyGetOrAddStateProviderAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
@@ -2541,44 +2322,39 @@ pub type fnNotifyGetOrAddStateProviderAsyncCompletion = ::core::option::Option<
         status: ::windows_core::HRESULT,
         store: *mut ::core::ffi::c_void,
         exist: ::windows::Win32::Foundation::BOOL,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub type fnNotifyGetVisibilitySequenceNumberCompletion = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *const ::core::ffi::c_void,
         status: ::windows_core::HRESULT,
         vsn: i64,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyRemoveAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         status: ::windows_core::HRESULT,
         removed: ::windows::Win32::Foundation::BOOL,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub type fnNotifyStateManagerChangeCallback = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         txnreplicator: *mut ::core::ffi::c_void,
         changekind: StateManagerChangeKind,
         pdata: *mut ::core::ffi::c_void,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub type fnNotifyStoreChangeCallback = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         stateprovider: *mut ::core::ffi::c_void,
         storechangekind: StoreChangeKind,
         pdata: *mut ::core::ffi::c_void,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyStoreKeyValueEnumeratorMoveNextAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
@@ -2590,18 +2366,16 @@ pub type fnNotifyStoreKeyValueEnumeratorMoveNextAsyncCompletion = ::core::option
         bytebuffer: *mut ::core::ffi::c_void,
         bufferlength: u32,
         versionsequencenumber: i64,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`*"]
 pub type fnNotifyTransactionChangeCallback = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         txnreplicator: *mut ::core::ffi::c_void,
         changekind: TransactionChangeKind,
         pdata: *mut ::core::ffi::c_void,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyTryDequeueAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
@@ -2611,26 +2385,23 @@ pub type fnNotifyTryDequeueAsyncCompletion = ::core::option::Option<
         objecthandle: usize,
         bytes: *mut ::core::ffi::c_void,
         byteslength: u32,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyUpdateAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         status: ::windows_core::HRESULT,
         updated: ::windows::Win32::Foundation::BOOL,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnNotifyUploadAsyncCompletion = ::core::option::Option<
     unsafe extern "system" fn(
         ctx: *mut ::core::ffi::c_void,
         uploaded: ::windows::Win32::Foundation::BOOL,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnUploadAsync = ::core::option::Option<
     unsafe extern "system" fn(
@@ -2638,9 +2409,8 @@ pub type fnUploadAsync = ::core::option::Option<
         backup_info: Backup_Info,
         uploadcallbackend: fnNotifyUploadAsyncCompletion,
         uploadasynccompletionctx: *mut ::core::ffi::c_void,
-    ) -> (),
+    ),
 >;
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"Win32_Foundation\"`*"]
 #[cfg(feature = "Win32_Foundation")]
 pub type fnUploadAsync2 = ::core::option::Option<
     unsafe extern "system" fn(
@@ -2649,7 +2419,7 @@ pub type fnUploadAsync2 = ::core::option::Option<
         size_backup_info: u32,
         uploadcallbackend: fnNotifyUploadAsyncCompletion,
         uploadasynccompletionctx: *mut ::core::ffi::c_void,
-    ) -> (),
+    ),
 >;
 #[cfg(feature = "implement")]
 ::core::include!("impl.rs");

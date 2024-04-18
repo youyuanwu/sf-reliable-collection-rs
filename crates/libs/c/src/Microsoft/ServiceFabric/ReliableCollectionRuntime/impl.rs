@@ -1,4 +1,3 @@
-#[doc = "*Required features: `\"ServiceFabric_ReliableCollectionRuntime\"`, `\"implement\"`*"]
 pub trait IFabricDataLossHandler_Impl: Sized {
     fn BeginOnDataLoss(
         &self,
@@ -59,6 +58,6 @@ impl IFabricDataLossHandler_Vtbl {
         }
     }
     pub fn matches(iid: &::windows_core::GUID) -> bool {
-        iid == &<IFabricDataLossHandler as ::windows_core::ComInterface>::IID
+        iid == &<IFabricDataLossHandler as ::windows_core::Interface>::IID
     }
 }
