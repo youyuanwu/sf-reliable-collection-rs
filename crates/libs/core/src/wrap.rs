@@ -728,6 +728,7 @@ impl KeyValueEnumerator {
     }
 
     // advanced, key, val, vsn
+    #[allow(clippy::type_complexity)]
     pub fn move_next_async(&self) -> Receiver<Result<(BOOL, HSTRING, Vec<u8>, i64), Error>> {
         let mut cts = CancellationToken::default();
         let mut advanced = BOOL::default();

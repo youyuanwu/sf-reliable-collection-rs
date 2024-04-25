@@ -13,7 +13,7 @@ features = [
 ]
 
 [dependencies.mssf-com]
-version = "0.0.3"
+version = "0.0.4"
 features = [
     "implement",
     "ServiceFabric_FabricCommon",
@@ -24,7 +24,7 @@ features = [
 
 # need to define some com interfaces
 [dependencies.windows]
-version = "0.54"
+version = "0.56"
 features = [
     "Win32_Foundation",
 ]
