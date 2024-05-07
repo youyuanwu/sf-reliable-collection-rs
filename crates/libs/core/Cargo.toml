@@ -12,23 +12,10 @@ features = [
   "Win32_Foundation"
 ]
 
-[dependencies.mssf-com]
-version = "0.0.4"
-features = [
-    "implement",
-    "ServiceFabric_FabricCommon",
-    "ServiceFabric_FabricCommon_FabricRuntime",
-    "Win32_Foundation"
-]
-
-
+[dependencies]
+mssf-com.workspace = true
 # need to define some com interfaces
-[dependencies.windows]
-version = "0.56"
-features = [
-    "Win32_Foundation",
-]
+windows.workspace = true
 
 # tokio oneshot
-[dependencies]
 tokio = { version = "*", features = ["sync"] }
