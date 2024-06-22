@@ -16,3 +16,9 @@ mssf-com = {version = "0.0.6", features = [
 mssf-core = "0.0.6"
 windows = {version = "0.56", features = [ "Win32_Foundation" ]}
 windows-core = { version = "0.56" }
+
+
+# testing code not released in cargo yet
+[patch.crates-io]
+mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}
+mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}

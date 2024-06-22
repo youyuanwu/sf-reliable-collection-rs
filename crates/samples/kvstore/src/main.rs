@@ -47,11 +47,15 @@ fn main() -> windows::core::Result<()> {
     let e = DefaultExecutor::new(rt.handle().clone());
     let runtime = mssf_core::runtime::Runtime::create(e.clone()).unwrap();
     let actctx = ActivationContext::create().unwrap();
-    let endpoint = actctx
+    let rplctr_endpoint = actctx
         .get_endpoint_resource(&HSTRING::from("KvReplicatorEndpoint"))
         .unwrap();
 
-    let factory = Factory::create(endpoint.Port, e.clone());
+    let grpc_endpoint = actctx
+        .get_endpoint_resource(&HSTRING::from("GrpcEndpoint"))
+        .unwrap();
+
+    let factory = Factory::create(rplctr_endpoint.Port, grpc_endpoint.Port, e.clone());
     runtime
         .register_stateful_service_factory(&HSTRING::from("KvStoreService"), factory)
         .unwrap();

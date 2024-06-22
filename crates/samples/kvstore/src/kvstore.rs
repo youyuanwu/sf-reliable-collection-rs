@@ -31,13 +31,15 @@ use crate::utils::DataLossHandler;
 
 pub struct Factory {
     replication_port: u32,
+    grpc_port: u32,
     rt: DefaultExecutor,
 }
 
 impl Factory {
-    pub fn create(replication_port: u32, rt: DefaultExecutor) -> Factory {
+    pub fn create(replication_port: u32, grpc_port: u32, rt: DefaultExecutor) -> Factory {
         Factory {
             replication_port,
+            grpc_port,
             rt,
         }
     }
@@ -68,9 +70,9 @@ impl StatefulServiceFactory for Factory {
             partitionid
         );
 
-        let svc = Service::new(self.rt.clone());
+        let svc = Service::new(self.grpc_port, self.rt.clone());
 
-        let replica = Replica::new(replicaid, svc, self.replication_port);
+        let replica = Replica::new(replicaid, svc, self.replication_port, self.grpc_port);
         Ok(replica)
     }
 }
@@ -78,12 +80,18 @@ impl StatefulServiceFactory for Factory {
 pub struct Replica {
     svc: Service,
     id: i64,
-    port: u32,
+    rplc_port: u32,
+    grpc_port: u32,
 }
 
 impl Replica {
-    pub fn new(id: i64, svc: Service, port: u32) -> Replica {
-        Replica { svc, id, port }
+    pub fn new(id: i64, svc: Service, rplc_port: u32, grpc_port: u32) -> Replica {
+        Replica {
+            svc,
+            id,
+            rplc_port,
+            grpc_port,
+        }
     }
 }
 
@@ -92,14 +100,16 @@ pub struct Service {
     rt: DefaultExecutor,
     store: Mutex<Cell<Option<Arc<TxnReplicaReplicator>>>>,
     tx: Mutex<Cell<Option<Sender<()>>>>,
+    grpc_port: u32,
 }
 
 impl Service {
-    pub fn new(rt: DefaultExecutor) -> Service {
+    pub fn new(grpc_port: u32, rt: DefaultExecutor) -> Service {
         Service {
             rt,
             store: Mutex::new(Cell::new(None)),
             tx: Mutex::new(Cell::new(None)),
+            grpc_port,
         }
     }
 
@@ -117,11 +127,12 @@ impl Service {
         self.stop();
         self.tx.lock().unwrap().set(Some(tx));
         let store = self.get_store();
+        let port = self.grpc_port;
 
         self.rt.spawn(async move {
-            info!("start grpc server.");
+            info!("start grpc server on port: {}", port);
             let svc = rpc::rpc_svc::new(store);
-            let addr = "[::1]:50051".parse().unwrap();
+            let addr = format!("[::1]:{}", port).parse().unwrap();
 
             Server::builder()
                 .add_service(
@@ -155,7 +166,7 @@ impl StatefulServiceReplica for Replica {
 
         let dataloss_handler: IFabricDataLossHandler = DataLossHandler {}.into();
 
-        let addr = get_addr(self.port, HSTRING::from("localhost"));
+        let addr = get_addr(self.rplc_port, HSTRING::from("localhost"));
         let waddr = HSTRING::from(addr);
 
         let txn_settings = TxnReplicator_Settings {
@@ -190,7 +201,7 @@ impl StatefulServiceReplica for Replica {
         if newrole == Role::Primary {
             self.svc.start_loop();
         }
-        let addr = HSTRING::from("my addr");
+        let addr = HSTRING::from(format!("http://localhost:{}", self.grpc_port));
         Ok(addr)
     }
     async fn close(&self) -> windows::core::Result<()> {
@@ -433,12 +444,41 @@ pub mod rpc {
 
     #[cfg(test)]
     mod test {
+        use std::time::Duration;
+
+        use mssf_core::{
+            client::{
+                svc_mgmt_client::{PartitionKeyType, ServiceEndpointRole},
+                FabricClient,
+            },
+            HSTRING,
+        };
+
         #[tokio::test]
         async fn test_connect() {
-            let mut client =
-                super::kvstore_service_client::KvstoreServiceClient::connect("http://[::1]:50051")
-                    .await
-                    .unwrap();
+            // resolve port on local onebox
+            let fc = FabricClient::new();
+            let svcc = fc.get_service_manager();
+            let resolution = svcc
+                .resolve_service_partition(
+                    &HSTRING::from("fabric:/KvStore/KvStoreService"),
+                    &PartitionKeyType::None,
+                    None,
+                    Duration::from_secs(1),
+                )
+                .await
+                .unwrap();
+            // find primary
+            let endpoint = resolution
+                .get_endpoint_list()
+                .iter()
+                .find(|e| e.role == ServiceEndpointRole::StatefulPrimary)
+                .expect("no primary found");
+            let addr = endpoint.address.to_string();
+
+            let mut client = super::kvstore_service_client::KvstoreServiceClient::connect(addr)
+                .await
+                .unwrap();
 
             let store_url = String::from("fabric:/mystore");
 

@@ -45,6 +45,8 @@ add_custom_command(TARGET build_rust_sample_kvstore POST_BUILD
     -E copy_if_different ${_pkg_src}/manifests/ApplicationManifest.xml ${_pkg_root}/ApplicationManifest.xml
     COMMAND ${CMAKE_COMMAND} 
     -E copy_if_different ${_pkg_exe} ${_pkg_root}/KvStoreServicePackage/Code/kvstore.exe
+    # COMMAND ${CMAKE_COMMAND} 
+    # -E copy_if_different ${CMAKE_SOURCE_DIR}/target/debug/kvstore.pdb ${_pkg_root}/KvStoreServicePackage/Code/kvstore.pdb
 )
 
 if(WIN32)

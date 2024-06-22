@@ -5,7 +5,7 @@
 // ------------------------------------------------------------
 
 use mssf_com::FabricCommon::{IFabricAsyncOperationCallback, IFabricAsyncOperationContext};
-use mssf_core::AsyncContext;
+use mssf_core::sync::wait::AsyncContext;
 use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     IFabricDataLossHandler, IFabricDataLossHandler_Impl,
 };

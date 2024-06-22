@@ -222,6 +222,46 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 
 [[package]]
+name = "clap"
+version = "4.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5db83dced34638ad474f39f250d7fea9598bdd239eaced1bdf45d597da0f433f"
+dependencies = [
+ "clap_builder",
+ "clap_derive",
+]
+
+[[package]]
+name = "clap_builder"
+version = "4.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7e204572485eb3fbf28f871612191521df159bc3e15a9f5064c66dba3a8c05f"
+dependencies = [
+ "anstream",
+ "anstyle",
+ "clap_lex",
+ "strsim",
+]
+
+[[package]]
+name = "clap_derive"
+version = "4.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c780290ccf4fb26629baa7a1081e68ced113f1d3ec302fa5948f1c381ebf06c6"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "clap_lex"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b82cf0babdbd58558212896d1a4272303a57bdb245c2bf1147185fb45640e70"
+
+[[package]]
 name = "colorchoice"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -288,19 +328,6 @@ checksum = "a009aa4810eb158359dda09d0c87378e4bbb89b5a801f016885a4707ba24f7ea"
 dependencies = [
  "log",
  "regex",
-]
-
-[[package]]
-name = "env_logger"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cd405aab171cb85d6735e5c8d9db038c17d3ca007a4d2c25f337935c3d90580"
-dependencies = [
- "humantime",
- "is-terminal",
- "log",
- "regex",
- "termcolor",
 ]
 
 [[package]]
@@ -444,6 +471,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
+name = "heck"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
+
+[[package]]
 name = "hermit-abi"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -555,17 +588,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "is-terminal"
-version = "0.4.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f23ff5ef2b80d608d61efee834934d862cd92461afc0560dedf493e4c033738b"
-dependencies = [
- "hermit-abi",
- "libc",
- "windows-sys 0.52.0",
-]
-
-[[package]]
 name = "itertools"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -585,7 +607,8 @@ name = "kvstore"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "env_logger 0.11.3",
+ "clap",
+ "env_logger",
  "log",
  "mssf-com",
  "mssf-core",
@@ -681,8 +704,7 @@ dependencies = [
 [[package]]
 name = "mssf-com"
 version = "0.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da75cbd70cbb5ef5f41135368251f3f23294cb8cfad24815f144f7e650175bf1"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=29a7a3a360c4f5312687b9331b7313118a6f953f#29a7a3a360c4f5312687b9331b7313118a6f953f"
 dependencies = [
  "mssf-metadata",
  "mssf-pal",
@@ -693,16 +715,14 @@ dependencies = [
 [[package]]
 name = "mssf-core"
 version = "0.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2991e961934f4fa8eb41ef75d842002fabe4c285e8f0a8ce84d48db123f2ffb6"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=29a7a3a360c4f5312687b9331b7313118a6f953f#29a7a3a360c4f5312687b9331b7313118a6f953f"
 dependencies = [
  "bitflags 2.5.0",
  "config",
  "ctrlc",
- "env_logger 0.10.2",
- "log",
  "mssf-com",
  "tokio",
+ "tracing",
  "trait-variant",
  "windows",
  "windows-core",
@@ -717,8 +737,7 @@ checksum = "39323a0ee935ad85894e31a9f42f2f41f5db403b7d2312d85e77b5a99eb8552d"
 [[package]]
 name = "mssf-pal"
 version = "0.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acad8268142c9cc79db4613ccc98a13afa0ce56fb09f4e21a063e3ece8083e0e"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=29a7a3a360c4f5312687b9331b7313118a6f953f#29a7a3a360c4f5312687b9331b7313118a6f953f"
 dependencies = [
  "libc",
  "windows",
@@ -896,7 +915,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c55e02e35260070b6f716a2423c2ff1c3bb1642ddca6f99e1f26d06268a0e2d2"
 dependencies = [
  "bytes",
- "heck",
+ "heck 0.4.1",
  "itertools",
  "log",
  "multimap",
@@ -1151,6 +1170,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "strsim"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
+
+[[package]]
 name = "syn"
 version = "2.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1177,15 +1202,6 @@ dependencies = [
  "fastrand",
  "rustix",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "termcolor"
-version = "1.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
-dependencies = [
- "winapi-util",
 ]
 
 [[package]]
@@ -1338,6 +1354,7 @@ version = "0.1.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3523ab5a71916ccf420eebdf5521fcef02141234bbc0b8a49f2fdc4544364ef"
 dependencies = [
+ "log",
  "pin-project-lite",
  "tracing-attributes",
  "tracing-core",
@@ -1418,37 +1435,6 @@ dependencies = [
  "once_cell",
  "rustix",
 ]
-
-[[package]]
-name = "winapi"
-version = "0.3.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c839a674fcd7a98952e593242ea400abe93992746761e38641405d28b00f419"
-dependencies = [
- "winapi-i686-pc-windows-gnu",
- "winapi-x86_64-pc-windows-gnu",
-]
-
-[[package]]
-name = "winapi-i686-pc-windows-gnu"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
-
-[[package]]
-name = "winapi-util"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f29e6f9198ba0d26b4c9f07dbe6f9ed633e1f3d5b8b414090084349e46a52596"
-dependencies = [
- "winapi",
-]
-
-[[package]]
-name = "winapi-x86_64-pc-windows-gnu"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "windows"
