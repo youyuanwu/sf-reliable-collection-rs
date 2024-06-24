@@ -40,7 +40,7 @@ jobs:
     - name: start sf cluster
       shell: pwsh
       run: |
-        Powershell.exe -File "C:\Program Files\Microsoft SDKs\Service Fabric\ClusterSetup\DevClusterSetup.ps1" -CreateOneNodeCluster
+        Powershell.exe -File "C:\Program Files\Microsoft SDKs\Service Fabric\ClusterSetup\DevClusterSetup.ps1"
         Start-Sleep -Seconds 20
         Connect-ServiceFabricCluster
       
@@ -97,7 +97,7 @@ jobs:
       run: sfctl --version
 
     - name: start sf
-      run: sudo /opt/microsoft/sdk/servicefabric/common/clustersetup/devclustersetup.sh --createonenodecluster
+      run: sudo /opt/microsoft/sdk/servicefabric/common/clustersetup/devclustersetup.sh
 
     - name: test cluster health
       run: |
