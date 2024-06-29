@@ -7,9 +7,7 @@
 use core::slice;
 use std::{ffi::c_void, ptr::addr_of_mut};
 
-use mssf_com::FabricCommon::FabricRuntime::{
-    IFabricPrimaryReplicator, IFabricStatefulServicePartition,
-};
+use mssf_com::FabricRuntime::{IFabricPrimaryReplicator, IFabricStatefulServicePartition};
 use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     fnNotifyAsyncCompletion, fnNotifyCreateEnumeratorAsyncCompletion, fnNotifyGetAsyncCompletion,
     fnNotifyGetOrAddStateProviderAsyncCompletion, fnNotifyRemoveAsyncCompletion,

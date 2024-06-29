@@ -7,18 +7,13 @@ members = [
 ]
 
 [workspace.dependencies]
-mssf-com = {version = "0.0.6", features = [     
-    "implement",
-    "ServiceFabric_FabricCommon",
-    "ServiceFabric_FabricCommon_FabricRuntime",
-    "Win32_Foundation"
-]}
-mssf-core = "0.0.6"
-windows = {version = "0.56", features = [ "Win32_Foundation" ]}
-windows-core = { version = "0.56" }
+mssf-com = {version = "0.0.7"}
+mssf-core = "0.0.7"
+windows = {version = "0.57", features = [ "Win32_Foundation" ]}
+windows-core = { version = "0.57" }
 
 
 # testing code not released in cargo yet
-[patch.crates-io]
-mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}
-mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}
+# [patch.crates-io]
+# mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}
+# mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}

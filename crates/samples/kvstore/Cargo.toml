@@ -28,7 +28,6 @@ path = "../../libs/core"
 
 [dependencies.sfrc-c]
 path = "../../libs/c"
-features = ["implement"]
 
 [build-dependencies]
 tonic-build = "*"

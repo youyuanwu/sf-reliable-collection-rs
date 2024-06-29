@@ -7,10 +7,6 @@ edition = "2021"
 
 [dependencies.sfrc-c]
 path = "../c"
-features = [
-  "ServiceFabric_ReliableCollectionRuntime",
-  "Win32_Foundation"
-]
 
 [dependencies]
 mssf-com.workspace = true

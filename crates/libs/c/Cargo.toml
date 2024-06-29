@@ -5,18 +5,10 @@ edition = "2018"
 publish = false
 
 [dependencies]
-windows-core = "0.56"
+windows-core = "0.57"
 
 [dependencies.windows]
-version = "0.56"
+version = "0.57"
 features = [
     "Win32_Foundation",
 ]
-
-[features]
-Win32_Foundation = []
-Foundation = []
-implement = []
-# generated features
-ServiceFabric = ["Foundation"]
-ServiceFabric_ReliableCollectionRuntime = ["ServiceFabric"]
