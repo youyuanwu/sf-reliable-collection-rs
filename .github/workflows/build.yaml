@@ -45,10 +45,16 @@ jobs:
         Connect-ServiceFabricCluster
       
     - name: provision app
-      run: Powershell.exe -File scripts/kvstore_ctl.ps1 -Action Add
+      run: Powershell.exe -File scripts/rcstore_ctl.ps1 -Action Add
 
     - name: run all unittests
       run: cargo test --all
+
+    - name: run rcstore cli
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+        .\scripts\rccli.ps1 -action List
 
   build-linux:
     runs-on: ${{ matrix.os }}
@@ -120,10 +126,10 @@ jobs:
     - name: provision app
       run: |
         sleep 30 # wait for cluster to be up
-        bash ./scripts/kvstore_ctl.sh -a add
+        bash ./scripts/rcstore_ctl.sh -a add
         sleep 30s
-        sfctl service health --service-id KvStore/KvStoreService
-        # sfctl service resolve --service-id KvStore/KvStoreService
+        sfctl service health --service-id RcStore/RcStoreService
+        # sfctl service resolve --service-id RcStore/RcStoreService
     # TODO: cannot resolve in ci
     # - name: run all unittests
     #   run: cargo test --all

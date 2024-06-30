@@ -1,13 +1,13 @@
 [package]
-name = "kvstore"
+name = "rcstore"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
-name = "kvcli"
-path = "kvcli/main.rs"
+name = "rccli"
+path = "rccli/main.rs"
 
 [dependencies]
 log = "*"

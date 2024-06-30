@@ -8,10 +8,10 @@ param(
 )
 $ErrorActionPreference = "Stop";
 
-$path = "build\kvstore_root"
+$path = "build\rcstore_root"
 
-$imageStorePath = "MyKvStoreApplicationV1"
-$appTypeName = "KvStore"
+$imageStorePath = "MyRcStoreApplicationV1"
+$appTypeName = "RcStore"
 
 if($Action -eq "Connect"){
     Connect-ServiceFabricCluster
@@ -30,7 +30,7 @@ if($Action -eq "Connect"){
     Remove-ServiceFabricApplicationPackage -ApplicationPackagePathInImageStore $imageStorePath -Force
 }elseif($Action -eq "Resolve"){
     Connect-ServiceFabricCluster
-    Resolve-ServiceFabricService -ServiceName fabric:/${appTypeName}/KvStoreService -PartitionKindSingleton -ForceRefresh
+    Resolve-ServiceFabricService -ServiceName fabric:/${appTypeName}/RcStoreService -PartitionKindSingleton -ForceRefresh
 }elseif($Action -eq "Echo"){
 
 }

@@ -15,10 +15,10 @@ use mssf_core::{
 use sfrc_core::wrap::ReliableCollectionRuntime;
 use windows_core::HSTRING;
 
-use crate::kvstore::Factory;
+use crate::rcstore::Factory;
 
 #[allow(non_camel_case_types, non_snake_case)]
-mod kvstore;
+mod rcstore;
 #[allow(non_camel_case_types, non_snake_case)]
 mod utils;
 
@@ -48,7 +48,7 @@ fn main() -> windows::core::Result<()> {
     let runtime = mssf_core::runtime::Runtime::create(e.clone()).unwrap();
     let actctx = ActivationContext::create().unwrap();
     let rplctr_endpoint = actctx
-        .get_endpoint_resource(&HSTRING::from("KvReplicatorEndpoint"))
+        .get_endpoint_resource(&HSTRING::from("ReplicatorEndpoint"))
         .unwrap();
 
     let grpc_endpoint = actctx
@@ -57,7 +57,7 @@ fn main() -> windows::core::Result<()> {
 
     let factory = Factory::create(rplctr_endpoint.Port, grpc_endpoint.Port, e.clone());
     runtime
-        .register_stateful_service_factory(&HSTRING::from("KvStoreService"), factory)
+        .register_stateful_service_factory(&HSTRING::from("RcStoreService"), factory)
         .unwrap();
 
     e.run_until_ctrl_c();

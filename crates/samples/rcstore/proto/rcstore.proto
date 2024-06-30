@@ -6,9 +6,9 @@
 
 syntax = "proto3";
 
-package kvstore_rpc;
+package rcstore_rpc;
 
-service kvstore_service {
+service rcstore_service {
   rpc add (add_request) returns (add_response) {}
   rpc get (get_request) returns (get_response) {}
   rpc remove(remove_request) returns (remove_response){}

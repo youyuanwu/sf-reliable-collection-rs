@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     std::env::set_var("PROTOC", exe);
     // generate kvstore for grpc
-    tonic_build::compile_protos("proto/kvstore.proto")?;
+    tonic_build::compile_protos("proto/rcstore.proto")?;
 
     Ok(())
 }

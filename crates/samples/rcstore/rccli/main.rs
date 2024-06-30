@@ -15,14 +15,14 @@ use mssf_core::{
     HSTRING,
 };
 
-tonic::include_proto!("kvstore_rpc"); // The string specified here must match the proto package name
+tonic::include_proto!("rcstore_rpc"); // The string specified here must match the proto package name
 
-use crate::kvstore_service_client::KvstoreServiceClient;
+use crate::rcstore_service_client::RcstoreServiceClient;
 
 #[derive(Parser)] // requires `derive` feature
 #[command(name = "kvcli")]
 #[command(bin_name = "kvcli")]
-enum KvCli {
+enum RcCli {
     List(ListArgs),
     Get(GetArgs),
     Add(AddArgs),
@@ -67,14 +67,14 @@ struct RemoveArgs {
 
 #[tokio::main]
 async fn main() {
-    let cli = KvCli::parse();
+    let cli = RcCli::parse();
 
     // resolve port on local onebox
     let fc = FabricClient::new();
     let svcc = fc.get_service_manager();
     let resolution = svcc
         .resolve_service_partition(
-            &HSTRING::from("fabric:/KvStore/KvStoreService"),
+            &HSTRING::from("fabric:/RcStore/RcStoreService"),
             &PartitionKeyType::None,
             None,
             Duration::from_secs(1),
@@ -89,11 +89,11 @@ async fn main() {
         .expect("no primary found");
     let addr = endpoint.address.to_string();
 
-    println!("Using kvstore addr: {}", addr);
-    let mut client = KvstoreServiceClient::connect(addr).await.unwrap();
+    println!("Using rcstore addr: {}", addr);
+    let mut client = RcstoreServiceClient::connect(addr).await.unwrap();
 
     match cli {
-        KvCli::List(args) => {
+        RcCli::List(args) => {
             let store_url = format!("fabric:/{}", args.db);
             let req = tonic::Request::new(EnumerateRequest {
                 store_url: store_url.clone(),
@@ -101,7 +101,7 @@ async fn main() {
             let resp = client.enumerate_all(req).await.expect("cannot list");
             println!("List={:?}", resp.into_inner().payload);
         }
-        KvCli::Get(args) => {
+        RcCli::Get(args) => {
             let store_url = format!("fabric:/{}", args.db);
             let req = tonic::Request::new(GetRequest {
                 store_url,
@@ -110,7 +110,7 @@ async fn main() {
             let response = client.get(req).await.expect("cannot get kv");
             println!("Get={:?}", response.into_inner());
         }
-        KvCli::Add(args) => {
+        RcCli::Add(args) => {
             let store_url = format!("fabric:/{}", args.db);
             let req = tonic::Request::new(AddRequest {
                 store_url,
@@ -120,7 +120,7 @@ async fn main() {
             let response = client.add(req).await.expect("cannot add kv");
             println!("Add={:?}", response.into_inner());
         }
-        KvCli::Remove(args) => {
+        RcCli::Remove(args) => {
             let store_url = format!("fabric:/{}", args.db);
             let req = tonic::Request::new(RemoveRequest {
                 store_url,

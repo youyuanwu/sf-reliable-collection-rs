@@ -34,14 +34,14 @@ fi
 if [ "$action" == "add" ]; then
   echo "add"
   sfctl cluster select
-  sfctl application upload --path build/kvstore_root
-  sfctl application provision --application-type-build-path kvstore_root
-  sfctl application create --app-name fabric:/KvStore --app-type KvStore --app-version 0.0.1
+  sfctl application upload --path build/rcstore_root
+  sfctl application provision --application-type-build-path rcstore_root
+  sfctl application create --app-name fabric:/RcStore --app-type RcStore --app-version 0.0.1
 elif [ "$action" == "remove" ]; then
   echo "remove"
   sfctl cluster select
-  sfctl application delete --application-id KvStore
-  sfctl application unprovision --application-type-name KvStore --application-type-version  0.0.1
+  sfctl application delete --application-id RcStore
+  sfctl application unprovision --application-type-name RcStore --application-type-version  0.0.1
 else
   echo "unknown command"
   exit 1

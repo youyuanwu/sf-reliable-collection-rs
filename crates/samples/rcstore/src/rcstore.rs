@@ -136,7 +136,7 @@ impl Service {
 
             Server::builder()
                 .add_service(
-                    crate::kvstore::rpc::kvstore_service_server::KvstoreServiceServer::new(svc),
+                    crate::rcstore::rpc::rcstore_service_server::RcstoreServiceServer::new(svc),
                 )
                 .serve_with_shutdown(addr, async {
                     rx.await.ok();
@@ -229,7 +229,7 @@ pub mod rpc {
     use windows::Win32::Foundation::ERROR_NOT_FOUND;
     use windows_core::{Error, HSTRING, PCWSTR};
 
-    tonic::include_proto!("kvstore_rpc"); // The string specified here must match the proto package name
+    tonic::include_proto!("rcstore_rpc"); // The string specified here must match the proto package name
 
     pub struct rpc_svc {
         store: Arc<TxnReplicaReplicator>,
@@ -330,7 +330,7 @@ pub mod rpc {
     }
 
     #[async_trait]
-    impl kvstore_service_server::KvstoreService for rpc_svc {
+    impl rcstore_service_server::RcstoreService for rpc_svc {
         async fn add(
             &self,
             request: tonic::Request<AddRequest>,
@@ -461,7 +461,7 @@ pub mod rpc {
             let svcc = fc.get_service_manager();
             let resolution = svcc
                 .resolve_service_partition(
-                    &HSTRING::from("fabric:/KvStore/KvStoreService"),
+                    &HSTRING::from("fabric:/RcStore/RcStoreService"),
                     &PartitionKeyType::None,
                     None,
                     Duration::from_secs(1),
@@ -476,7 +476,7 @@ pub mod rpc {
                 .expect("no primary found");
             let addr = endpoint.address.to_string();
 
-            let mut client = super::kvstore_service_client::KvstoreServiceClient::connect(addr)
+            let mut client = super::rcstore_service_client::RcstoreServiceClient::connect(addr)
                 .await
                 .unwrap();
 
