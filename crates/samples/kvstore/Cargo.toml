@@ -12,3 +12,12 @@ tokio = { version = "1", features = ["full"] }
 windows-core = "0.57"
 mssf-com.workspace = true
 mssf-core.workspace = true
+tonic = "*"
+prost = "*"
+
+[build-dependencies]
+tonic-build = "*"
+prost-build = "*"
+
+[package.metadata.rust-analyzer]
+cargo.loadOutDirsFromCheck = true

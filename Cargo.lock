@@ -608,7 +608,11 @@ version = "0.1.0"
 dependencies = [
  "mssf-com",
  "mssf-core",
+ "prost",
+ "prost-build",
  "tokio",
+ "tonic",
+ "tonic-build",
  "tracing",
  "tracing-subscriber",
  "windows-core",
@@ -719,6 +723,14 @@ dependencies = [
  "trait-variant",
  "windows",
  "windows-core",
+]
+
+[[package]]
+name = "mssf-ext"
+version = "0.1.0"
+dependencies = [
+ "mssf-com",
+ "mssf-core",
 ]
 
 [[package]]

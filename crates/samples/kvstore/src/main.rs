@@ -11,6 +11,7 @@ use tracing::info;
 use crate::kvstore::Factory;
 
 mod kvstore;
+mod rpc;
 
 fn has_debug_arg() -> bool {
     let args: Vec<String> = std::env::args().collect();
