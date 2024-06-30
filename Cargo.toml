@@ -11,7 +11,8 @@ mssf-com = {version = "0.0.7"}
 mssf-core = "0.0.7"
 windows = {version = "0.57", features = [ "Win32_Foundation" ]}
 windows-core = { version = "0.57" }
-
+tracing = { version = "0.1.40", features = ["log"] }
+tracing-subscriber = { version = "0.3.18",  default-features = false, features = ["fmt"]}
 
 # testing code not released in cargo yet
 # [patch.crates-io]

@@ -70,6 +70,7 @@ add_custom_target(generate_rust
 )
 
 add_subdirectory(crates/samples/rcstore)
+add_subdirectory(crates/samples/kvstore)
 
 add_custom_target(force_clean
   COMMAND ${CMAKE_COMMAND} -E rm -rf crates/libs/c/src/Microsoft
