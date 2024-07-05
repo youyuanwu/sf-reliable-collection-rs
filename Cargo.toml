@@ -13,8 +13,10 @@ windows = {version = "0.57", features = [ "Win32_Foundation" ]}
 windows-core = { version = "0.57" }
 tracing = { version = "0.1.40", features = ["log"] }
 tracing-subscriber = { version = "0.3.18",  default-features = false, features = ["fmt"]}
+trait-variant = "0.1.1"
+bytes = "1.6.0"
 
 # testing code not released in cargo yet
-# [patch.crates-io]
-# mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}
-# mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "29a7a3a360c4f5312687b9331b7313118a6f953f"}
+[patch.crates-io]
+mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"}
+mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"}

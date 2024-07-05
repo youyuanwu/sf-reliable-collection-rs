@@ -199,9 +199,9 @@ checksum = "cf4b9d6a944f767f8e5e0db018570623c85f3d925ac718db4e06d0187adb21c1"
 
 [[package]]
 name = "bytes"
-version = "1.5.0"
+version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
+checksum = "514de17de45fdb8dc022b1a7975556c53c86f9f0aa5f534b98977b171857c2c9"
 
 [[package]]
 name = "cc"
@@ -699,8 +699,7 @@ dependencies = [
 [[package]]
 name = "mssf-com"
 version = "0.0.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5322f3914f9d37746e8d7740f05c514b73347aebf7e481e09742f380cbb53bf"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a#3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"
 dependencies = [
  "mssf-metadata",
  "mssf-pal",
@@ -711,8 +710,7 @@ dependencies = [
 [[package]]
 name = "mssf-core"
 version = "0.0.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea1745cc23aefcebb58dc9d58b4829fc28e35458094e0d00853bb87935eab150"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a#3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"
 dependencies = [
  "bitflags 2.5.0",
  "config",
@@ -729,8 +727,12 @@ dependencies = [
 name = "mssf-ext"
 version = "0.1.0"
 dependencies = [
+ "bytes",
  "mssf-com",
  "mssf-core",
+ "tracing",
+ "trait-variant",
+ "windows-core",
 ]
 
 [[package]]
@@ -742,8 +744,7 @@ checksum = "39323a0ee935ad85894e31a9f42f2f41f5db403b7d2312d85e77b5a99eb8552d"
 [[package]]
 name = "mssf-pal"
 version = "0.0.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fbc2e27115685d6c96f5b4c5194a5a0ec8643ebbc600a737288a746f5175896"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a#3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"
 dependencies = [
  "libc",
  "windows",

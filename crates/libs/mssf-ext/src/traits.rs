@@ -1,0 +1,125 @@
+use bytes::Buf;
+use mssf_core::runtime::{stateful_types::Epoch, store_types::ReplicatorSettings};
+
+/// Defines the behavior that a service must implement to interact with the FabricReplicator.
+#[trait_variant::make(StateProvider: Send)]
+pub trait LocalStateProvider: Sync + 'static {
+    /// Indicates to a replica that the configuration of a replica
+    /// set has changed due to a change or attempted change to the
+    /// primary replica. The change occurs due to failure or load balancing
+    /// of the previous primary replica.
+    /// Epoch changes act as a barrier by segmenting operations into the
+    /// exact configuration periods in which they were sent by a specific primary replica.
+    async fn update_epoch(
+        &self,
+        epoch: &Epoch,
+        previousepochlastsequencenumber: i64,
+    ) -> mssf_core::Result<()>;
+
+    /// Obtains the last sequence number that the service has committed,
+    /// also known as Logical Sequence Number (LSN).
+    fn get_last_committed_sequence_number(&self) -> mssf_core::Result<i64>;
+
+    /// Indicates that a write quorum of replicas in this replica set has been lost,
+    /// and that therefore data loss might have occurred.
+    /// The replica set consists of a majority of replicas, which includes the primary replica.
+    async fn on_data_loss(&self) -> mssf_core::Result<bool>; // is state changed.
+
+    /// Obtains context on a secondary replica after it is created
+    /// and opened to send context to the primary replica.
+    ///
+    /// Remarks:The Primary replica analyzes the context and sends back state
+    /// via getCopyState(SequenceNumber upToSequenceNumber, OperationDataStream copyContext).
+    /// getCopyContext() is called on newly created, idle Secondary replicas and provides a
+    /// mechanism to asynchronously establish a bidirectional conversation with the Primary replica.
+    /// The Secondary replica sends OperationData objects with which the Primary replica can
+    /// determine the progress of collecting context on the Secondary replica.
+    /// The Primary replica responds by sending the required state back.
+    /// See getCopyState(SequenceNumber upToSequenceNumber, OperationDataStream copyContext)
+    /// at the Primary replica for the other half of the exchange.
+    /// For in-memory services, the getCopyContext() method is not called, as the state of the
+    /// Secondary replicas is known (they are empty and will require all of the state).
+    fn get_copy_context(&self) -> mssf_core::Result<impl OperationDataStream>;
+
+    /// Obtains state on a primary replica that is required to build a secondary replica.
+    /// Just as getCopyContext() enables the Secondary replica to send context to the
+    /// Primary replica via an OperationDataStream,
+    /// getCopyState(SequenceNumber upToSequenceNumber, OperationDataStream copyContext)
+    /// enables the Primary replica to respond with an OperationDataStream.
+    /// The stream contains objects that are delivered to the Secondary replica via the
+    /// getCopyStream() method of the FabricReplicator class. The objects implement Operation and contain the specified data.
+    /// When the Primary replica receives this call, it should create and return another
+    /// OperationDataStream that contains OperationData.
+    /// OperationData represents the data/state that the Secondary replica
+    fn get_copy_state(
+        &self,
+        upto_sequence_number: i64,
+        copy_context_stream: &impl OperationDataStream,
+    ) -> mssf_core::Result<impl OperationDataStream>;
+}
+
+/// Exposes replication related functions of the FabricReplicator class that are
+/// used by StateProvider to replicate state to ensure high availability.
+#[trait_variant::make(StateReplicator: Send)]
+pub trait LocalStateReplicator {
+    /// Replicates state changes from Primary replica to the Secondary replicas
+    /// and receives a quorum acknowledgement that those state changes have been applied.
+    ///
+    /// TODO: figure out cancellation.
+    /// Parameters:
+    /// operationData - Represents the state change that the Primary replica wants to replicate.
+    /// sequenceNumber - Long, the LSN of the operation. Note that this is the same value which is returned by the task.
+    ///   Providing it as an out parameter is useful for services which want to prepare the local write to commit when the task finishes.
+    /// cancellationToken - A write quorum of replicas that have been lost.
+    ///   It can be used to send a notification that the operation should be canceled.
+    ///   Note that cancellation is advisory and that the operation might still be completed even if it is canceled.
+    /// Returns:
+    /// Returns completable future of type long, the LSN of the operation.
+    async fn replicate(
+        operation_data: &impl OperationData,
+        sequence_number: i64,
+    ) -> mssf_core::Result<i64>;
+
+    /// Gets replication stream.
+    /// Returns:
+    /// The ReplicationStream implements OperationStream.
+    /// The ReplicationStream contains OperationData objects that implement Operation.
+    /// The objects are provided by the Primary replica via
+    /// replicateAsync(OperationData operationData, SequenceNumber sequenceNumber, CancellationToken cancellationToken).
+    /// Generally a Secondary replica should send getOperationAsync(CancellationToken cancellationToken).
+    /// Although Service Fabric does not require services to do so, generally services should transfer all
+    /// OperationData objects out of the copy stream first, and then transfer operations out of the replication stream.
+    /// The transfer from both copies in parallel is supported but increases the complexity of applying state updates
+    /// correctly and is recommended only for advanced services. The stream is empty when the returned Operation method is null.
+    fn get_replication_stream() -> mssf_core::Result<impl OperationDataStream>;
+
+    /// Gets copy stream
+    /// Returns:
+    /// The returned CopyStream contains OperationData objects that implement Operation.
+    /// The OperationData objects are obtained from the CopyState OperationDataStream that the
+    /// Primary replica returns from getCopyState(SequenceNumber upToSequenceNumber, OperationDataStream copyContext).
+    /// When a replica is created and has to catch up, it should obtain the CopyStream and begin to send, apply,
+    /// and acknowledge the Copy objects that implement Operation. In parallel, the replica responds
+    /// to the corresponding getCopyContext() and getNextAsync(CancellationToken cancellationToken)calls.
+    /// The stream is empty when the returned Operation method is null.
+    fn get_copy_stream() -> mssf_core::Result<impl OperationDataStream>;
+
+    /// Enables modification of replicator settings during runtime. The only setting which can be modified is the security credentials.
+    /// Parameters:
+    /// settings - The new ReplicatorSettings with updated credentials.
+    fn update_replicator_settings(&self, settings: &ReplicatorSettings) -> mssf_core::Result<()>;
+
+    /// Retrieves the replicator settings during runtime.
+    /// Returns:
+    /// The current ReplicatorSettings from the Service Fabric runtime.
+    fn get_replicator_settings(&self) -> mssf_core::Result<ReplicatorSettings>;
+}
+
+pub trait OperationData {
+    fn get_data(&self) -> mssf_core::Result<&impl Buf>;
+}
+
+#[trait_variant::make(OperationDataStream: Send)]
+pub trait LocalOperationDataStream {
+    async fn get_next(&self) -> Option<impl OperationData>;
+}
