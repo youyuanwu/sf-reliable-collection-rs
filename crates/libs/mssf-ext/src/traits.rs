@@ -1,6 +1,8 @@
 use bytes::Buf;
 use mssf_core::runtime::{stateful_types::Epoch, store_types::ReplicatorSettings};
 
+use crate::types::OperationMetadata;
+
 /// Defines the behavior that a service must implement to interact with the FabricReplicator.
 #[trait_variant::make(StateProvider: Send)]
 pub trait LocalStateProvider: Sync + 'static {
@@ -54,7 +56,7 @@ pub trait LocalStateProvider: Sync + 'static {
     fn get_copy_state(
         &self,
         upto_sequence_number: i64,
-        copy_context_stream: &impl OperationDataStream,
+        copy_context_stream: impl OperationDataStream,
     ) -> mssf_core::Result<impl OperationDataStream>;
 }
 
@@ -76,8 +78,9 @@ pub trait LocalStateReplicator {
     /// Returns:
     /// Returns completable future of type long, the LSN of the operation.
     async fn replicate(
-        operation_data: &impl OperationData,
-        sequence_number: i64,
+        &self,
+        operation_data: impl OperationData,
+        sequence_number: &mut i64,
     ) -> mssf_core::Result<i64>;
 
     /// Gets replication stream.
@@ -91,7 +94,7 @@ pub trait LocalStateReplicator {
     /// OperationData objects out of the copy stream first, and then transfer operations out of the replication stream.
     /// The transfer from both copies in parallel is supported but increases the complexity of applying state updates
     /// correctly and is recommended only for advanced services. The stream is empty when the returned Operation method is null.
-    fn get_replication_stream() -> mssf_core::Result<impl OperationDataStream>;
+    fn get_replication_stream(&self) -> mssf_core::Result<impl OperationStream>;
 
     /// Gets copy stream
     /// Returns:
@@ -102,7 +105,7 @@ pub trait LocalStateReplicator {
     /// and acknowledge the Copy objects that implement Operation. In parallel, the replica responds
     /// to the corresponding getCopyContext() and getNextAsync(CancellationToken cancellationToken)calls.
     /// The stream is empty when the returned Operation method is null.
-    fn get_copy_stream() -> mssf_core::Result<impl OperationDataStream>;
+    fn get_copy_stream(&self) -> mssf_core::Result<impl OperationStream>;
 
     /// Enables modification of replicator settings during runtime. The only setting which can be modified is the security credentials.
     /// Parameters:
@@ -115,11 +118,31 @@ pub trait LocalStateReplicator {
     fn get_replicator_settings(&self) -> mssf_core::Result<ReplicatorSettings>;
 }
 
-pub trait OperationData {
+// Operation data itself is Buf as well.
+pub trait OperationData: Buf + Sync + Send + 'static {
     fn get_data(&self) -> mssf_core::Result<&impl Buf>;
 }
 
 #[trait_variant::make(OperationDataStream: Send)]
-pub trait LocalOperationDataStream {
-    async fn get_next(&self) -> Option<impl OperationData>;
+pub trait LocalOperationDataStream: Sync + 'static {
+    // Returning null indicates to the system that the transfer is complete.
+    async fn get_next(&self) -> mssf_core::Result<Option<impl OperationData>>;
+}
+
+// IFabricOperation
+pub trait Operation {
+    fn get_metadate(&self) -> OperationMetadata;
+
+    fn get_data(&self) -> mssf_core::Result<impl Buf>;
+
+    fn acknowledge(&self) -> mssf_core::Result<()>;
+}
+
+// Represents a stream of replication or copy operations that are sent
+// from the Primary to the Secondary replica.
+#[trait_variant::make(OperationStream: Send)]
+pub trait LocalOperationStream {
+    // returns null if end of stream.
+    async fn get_operation(&self) -> mssf_core::Result<Option<impl Operation>>;
+    fn report_fault(&self) -> mssf_core::Result<()>; // TODO:
 }

@@ -10,7 +10,7 @@ use windows_core::implement;
 use crate::traits::OperationData;
 
 #[repr(C)]
-pub struct OperationDataBuffer(FABRIC_OPERATION_DATA_BUFFER);
+struct OperationDataBuffer(FABRIC_OPERATION_DATA_BUFFER);
 
 impl OperationDataBuffer {
     pub fn as_bytes(&self) -> &[u8] {
@@ -70,7 +70,7 @@ impl OperationDataProxy {
         })
     }
 
-    pub fn get_data(&self) -> &[OperationDataBuffer] {
+    fn get_data(&self) -> &[OperationDataBuffer] {
         self.owner.get_data().unwrap() // checked at new so this will not panic
     }
 
@@ -187,6 +187,37 @@ impl<T: Buf> IFabricOperationData_Impl for OperationDataBridge<T> {
         let ptr = self.cache.as_ptr();
         unsafe { *count = self.cache.len() as u32 };
         Ok(ptr as *mut FABRIC_OPERATION_DATA_BUFFER)
+    }
+}
+
+// simple wrap of any Buf to impl OperationData
+pub struct OperationDataBuf<T: Buf> {
+    data: T,
+}
+
+impl<T: Buf> OperationDataBuf<T> {
+    pub fn new(data: T) -> Self {
+        Self { data }
+    }
+}
+
+impl<T: Buf + Send + Sync + 'static> OperationData for OperationDataBuf<T> {
+    fn get_data(&self) -> mssf_core::Result<&impl Buf> {
+        Ok(&self.data)
+    }
+}
+
+impl<T: Buf> Buf for OperationDataBuf<T> {
+    fn remaining(&self) -> usize {
+        self.data.remaining()
+    }
+
+    fn chunk(&self) -> &[u8] {
+        self.data.chunk()
+    }
+
+    fn advance(&mut self, cnt: usize) {
+        self.data.advance(cnt)
     }
 }
 
