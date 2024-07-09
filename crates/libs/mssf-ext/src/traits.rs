@@ -130,11 +130,29 @@ pub trait LocalOperationDataStream: Sync + 'static {
 }
 
 // IFabricOperation
-pub trait Operation {
+pub trait Operation: Send {
+    /// Gets the type of this operation.
+    /// Remarks:The OperationType indicates the type of operation.
+    /// "Normal" operations are those operations that are sent by non-service
+    /// grouped services as part of either the copy or replication streams.
+    /// Other types of operations represent control operations that are specific to service groups.
     fn get_metadate(&self) -> OperationMetadata;
 
+    /// Gets the OperationData that are provided by the Primary replica.
     fn get_data(&self) -> mssf_core::Result<impl Buf>;
 
+    /// Acknowledges that this operation has been successfully applied at the Secondary replica.
+    /// Remarks:Services should call this method when they have obtained
+    /// an system.fabric.Operation from the replicator and successfully applied
+    /// it to their local store. For persisted services, calling this method is mandatory
+    ///  because the FabricReplicator does not release additional objects that
+    /// implement system.fabric.Operation. For volatile services, the replicator
+    /// implicitly acknowledges operations when they are received unless they are
+    /// configured otherwise by setting the value isRequireServiceAck() to true.
+    /// An operation must be acknowledged by a quorum of replicas before the Primary
+    /// replica receives the
+    /// replicateAsync(OperationData operationData, SequenceNumber sequenceNumber, CancellationToken cancellationToken)
+    /// operation complete responses.
     fn acknowledge(&self) -> mssf_core::Result<()>;
 }
 

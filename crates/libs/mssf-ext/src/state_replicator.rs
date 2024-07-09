@@ -9,8 +9,15 @@ use crate::{
 
 use windows_core::Interface;
 
+#[derive(Clone)]
 pub struct StateReplicatorProxy {
     com_impl: IFabricStateReplicator2,
+}
+
+impl StateReplicatorProxy {
+    pub fn new(com_impl: IFabricStateReplicator2) -> Self {
+        Self { com_impl }
+    }
 }
 
 impl StateReplicator for StateReplicatorProxy {

@@ -15,6 +15,7 @@
     </EntryPoint>
     <EnvironmentVariables>
       <EnvironmentVariable Name="RUST_LOG" Value="info"/>
+      <EnvironmentVariable Name="RUST_BACKTRACE" Value="full"/>
     </EnvironmentVariables>
   </CodePackage>
   <!-- <ConfigPackage Name="EchoAppService.Config" Version="1.0" /> -->

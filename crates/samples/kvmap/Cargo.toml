@@ -10,5 +10,6 @@ mssf-ext = {path = "../../libs/mssf-ext"}
 tracing.workspace = true
 tracing-subscriber.workspace = true
 tokio.workspace = true
+tokio-util.workspace = true
 windows-core.workspace = true
 bytes.workspace = true

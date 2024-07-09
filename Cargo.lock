@@ -611,6 +611,7 @@ dependencies = [
  "mssf-core",
  "mssf-ext",
  "tokio",
+ "tokio-util",
  "tracing",
  "tracing-subscriber",
  "windows-core",
