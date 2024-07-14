@@ -1,6 +1,9 @@
 pub mod app;
 pub mod data;
 pub mod kvmap;
+pub mod rpc;
+#[cfg(test)]
+mod test;
 
 use std::path::PathBuf;
 
@@ -31,6 +34,7 @@ fn has_debug_arg() -> bool {
 pub struct ProcCtx {
     rt: DefaultExecutor,
     replication_port: u32,
+    rpc_port: u32,
     workdir: PathBuf,
 }
 
@@ -48,10 +52,14 @@ fn main() -> mssf_core::Result<()> {
     let endpoint = actctx
         .get_endpoint_resource(&HSTRING::from("KvReplicatorEndpoint"))
         .unwrap();
+    let rpc_endpoint = actctx
+        .get_endpoint_resource(&HSTRING::from("KvRpcEndpoint"))
+        .unwrap();
     let work_dir: HSTRINGWrap = unsafe { actctx.get_com().get_WorkDirectory() }.into();
     let ctx = ProcCtx {
         rt: e.clone(),
         replication_port: endpoint.Port,
+        rpc_port: rpc_endpoint.Port,
         workdir: PathBuf::from(HSTRING::from(work_dir).to_string()),
     };
 

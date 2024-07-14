@@ -44,8 +44,11 @@ jobs:
         Start-Sleep -Seconds 20
         Connect-ServiceFabricCluster
       
-    - name: provision app
-      run: Powershell.exe -File scripts/rcstore_ctl.ps1 -Action Add
+    - name: provision apps
+      run: |
+        Powershell.exe -File scripts/rcstore_ctl.ps1 -Action Add
+        Powershell.exe -File scripts/kvmap_ctl.ps1 -Action Add
+    # todo: may need to sleep to wait for app to be up. but test compilation may take some time.
 
     - name: run all unittests
       run: cargo test --all

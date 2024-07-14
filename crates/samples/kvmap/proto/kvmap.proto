@@ -1,0 +1,25 @@
+// ------------------------------------------------------------
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT License (MIT). See License in the repo root for
+// license information.
+// ------------------------------------------------------------
+
+syntax = "proto3";
+
+package kvmap_rpc;
+
+service kvmap_service {
+  rpc get_data(empty_payload) returns (data_sn_payload){}
+  rpc set_data(data_sn_payload) returns (status_payload) {}
+}
+
+message empty_payload {}
+message data_sn_payload{
+  string data = 1;
+  // for set requeset, sn is not yet used, it is for the min sn to check.
+  int64 sn = 2;
+}
+message status_payload{
+  bool ok = 1;
+  int64 sn = 2; // output sn after insert
+}

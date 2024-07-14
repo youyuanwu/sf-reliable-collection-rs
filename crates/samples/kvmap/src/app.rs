@@ -1,5 +1,9 @@
 use std::{cell::Cell, io::ErrorKind, path::Path};
 
+use bytes::Bytes;
+use mssf_ext::{
+    data::OperationDataBuf, state_replicator::StateReplicatorProxy, traits::StateReplicator,
+};
 use tracing::info;
 
 use crate::data::SingleDB;
@@ -48,6 +52,20 @@ impl KvApp {
             return Err(std::io::Error::from(ErrorKind::NotFound));
         }
         Ok(())
+    }
+
+    // set the local data also replicas to secondaries.
+    pub async fn set_data_client(
+        &self,
+        sr: &StateReplicatorProxy,
+        data: String,
+    ) -> std::io::Result<i64> {
+        let mut out = 0_i64;
+        let buf = OperationDataBuf::new(Bytes::from(data.clone()));
+        let sn = sr.replicate(buf, &mut out).await.unwrap();
+        assert_eq!(out, sn);
+        self.set_data(sn, data.clone()).await.unwrap();
+        Ok(sn)
     }
 
     pub async fn get_data(&self) -> std::io::Result<(i64, String)> {

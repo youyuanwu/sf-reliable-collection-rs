@@ -29,10 +29,14 @@ use mssf_ext::{
 use serde::{Deserialize, Serialize};
 use tokio::{select, sync::Mutex};
 use tokio_util::sync::CancellationToken;
+use tonic::transport::Server;
 use tracing::{error, info};
 use windows_core::Interface;
 
-use crate::{app::KvApp, data::VecOperationDataStream, ProcCtx};
+use crate::{
+    app::KvApp, data::VecOperationDataStream, rpc::kvmap_service_server::KvmapServiceServer,
+    ProcCtx,
+};
 
 pub struct Factory {
     ctx: ProcCtx,
@@ -181,6 +185,29 @@ impl Replica {
             role: Mutex::new(Cell::new(Role::Unknown)),
         }
     }
+
+    fn start_rpc(
+        rt: DefaultExecutor,
+        sr: StateReplicatorProxy,
+        app: Arc<KvApp>,
+        svc_addr: String,
+        token: CancellationToken,
+    ) {
+        // start rpc server
+        rt.spawn(async move {
+            info!("start grpc server on addr: {}", svc_addr);
+            let svc = crate::rpc::KvMapRpc::new(app, sr);
+            let addr = svc_addr.parse().unwrap();
+            Server::builder()
+                .add_service(KvmapServiceServer::new(svc))
+                .serve_with_shutdown(addr, async {
+                    token.cancelled().await;
+                    println!("Graceful shutdown tonic complete")
+                })
+                .await
+                .unwrap();
+        });
+    }
 }
 
 impl StatefulServiceReplica for Replica {
@@ -245,9 +272,9 @@ impl StatefulServiceReplica for Replica {
         }
 
         // initiate the cancel token for closing.
-        //let token = CancellationToken::new();
+        let new_token = CancellationToken::new();
         let token = self.cancel.lock().await;
-        let prev = token.replace(Some(CancellationToken::new()));
+        let prev = token.replace(Some(new_token));
         assert!(prev.is_none());
 
         // return the replicator.
@@ -265,12 +292,15 @@ impl StatefulServiceReplica for Replica {
             .get_mut()
             .clone()
             .unwrap();
-        let dummy_addr = HSTRING::from("myhost:12345");
+        let rpc_port = self.ctx.rpc_port;
+        let svc_addr = format!("[::1]:{}", rpc_port);
+        // include scheme in the svc addr returned to SF.
+        let addr_res = HSTRING::from(format!("http://{}", svc_addr));
         // clean up pending stuff
         let curr_role = self.role.lock().await.get_mut().clone();
         if curr_role == newrole {
             // nothing has changed.
-            return Ok(dummy_addr);
+            return Ok(addr_res);
         }
 
         if !matches!(curr_role, Role::None | Role::Unknown) {
@@ -283,11 +313,18 @@ impl StatefulServiceReplica for Replica {
 
         let token = self.cancel.lock().await.get_mut().clone().unwrap();
         let state = self.state.clone();
+        let new_svc_token = token.child_token();
+
+        let app = self.state.app.clone();
+        let sr2 = sr.clone();
+
         match newrole {
             Role::ActiveSecondary => {
+                // start rpc server on secondary
+                Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
                 // Handle replicate stream from primary
                 self.ctx.rt.spawn(async move {
-                    let rplct_stream = sr.get_replication_stream().unwrap();
+                    let rplct_stream = sr2.get_replication_stream().unwrap();
                     loop {
                         let opt = select! {
                             _ = token.cancelled() => { None }
@@ -336,33 +373,30 @@ impl StatefulServiceReplica for Replica {
                 // delete stuff on disk?
             }
             Role::Primary => {
+                // start rpc server on primary
+                Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
                 // start replicate?
-                self.ctx.rt.spawn(async move {
-                    let mut i = 0;
-                    loop {
-                        select! {
-                            _ = token.cancelled() => {
-                                info!("replicate loop cancelled.");
-                                break ;
-                            }
-                            _ = tokio::time::sleep(std::time::Duration::from_secs(15)) => {}
-                        };
-                        let mut out = 0_i64;
-                        let data = format!("replicate-data-{i}");
-                        let buf = OperationDataBuf::new(Bytes::from(data.clone()));
-                        let sn = sr.replicate(buf, &mut out).await.unwrap();
-                        assert_eq!(out, sn);
-                        state.apply(sn);
-                        state.app.set_data(sn, data.clone()).await.unwrap();
-                        info!("replicated lsn {out}, data: {data}");
-                        i += 1;
-                    }
-                })
+                // self.ctx.rt.spawn(async move {
+                //     let mut i = 0;
+                //     loop {
+                //         select! {
+                //             _ = token.cancelled() => {
+                //                 info!("replicate loop cancelled.");
+                //                 break ;
+                //             }
+                //             _ = tokio::time::sleep(std::time::Duration::from_secs(15)) => {}
+                //         };
+                //         let data = format!("replicate-data-{i}");
+                //         let sn = state.app.set_data_client(&sr2, data.clone()).await.unwrap();
+                //         state.apply(sn);
+                //         info!("replicated lsn {sn}, data: {data}");
+                //         i += 1;
+                //     }
+                // })
             }
             Role::Unknown => panic!("Unknonw role"),
         }
-
-        Ok(dummy_addr)
+        Ok(addr_res)
     }
 
     async fn close(&self) -> mssf_core::Result<()> {
