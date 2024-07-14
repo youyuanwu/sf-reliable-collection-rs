@@ -13,3 +13,5 @@ tokio.workspace = true
 tokio-util.workspace = true
 windows-core.workspace = true
 bytes.workspace = true
+serde_json.workspace = true
+serde.workspace = true

@@ -85,17 +85,17 @@ impl<T: OperationDataStream, E: Executor> IFabricOperationDataStream_Impl
     }
 }
 
-pub struct OpeartionDataStreamProxy {
+pub struct OperationDataStreamProxy {
     com_impl: IFabricOperationDataStream,
 }
 
-impl OpeartionDataStreamProxy {
+impl OperationDataStreamProxy {
     pub fn new(com_impl: IFabricOperationDataStream) -> Self {
         Self { com_impl }
     }
 }
 
-impl OperationDataStream for OpeartionDataStreamProxy {
+impl OperationDataStream for OperationDataStreamProxy {
     async fn get_next(&self) -> mssf_core::Result<Option<impl OperationData>> {
         // get the data from com
         let (tx, rx) = tokio::sync::oneshot::channel();
@@ -185,7 +185,7 @@ mod test {
 
     use crate::{
         data::OperationDataBuf,
-        stream::OpeartionDataStreamProxy,
+        stream::OperationDataStreamProxy,
         traits::{OperationData, OperationDataStream},
     };
 
@@ -221,7 +221,7 @@ mod test {
         // wrap in bridge and back in proxy
         let bridge: IFabricOperationDataStream =
             OpeartionDataStreamBridge::new(mystream, rt).into();
-        let proxy = OpeartionDataStreamProxy::new(bridge);
+        let proxy = OperationDataStreamProxy::new(bridge);
 
         let d0 = proxy.get_next().await.unwrap().unwrap();
         assert_eq!(d0.chunk(), "value0".as_bytes());

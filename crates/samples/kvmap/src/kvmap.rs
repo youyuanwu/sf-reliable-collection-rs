@@ -22,27 +22,25 @@ use mssf_ext::{
     state_provider::StateProviderBridge,
     state_replicator::StateReplicatorProxy,
     traits::{
-        LocalOperationStream, LocalStateReplicator, Operation, OperationDataStream, StateProvider,
+        LocalOperationStream, LocalStateReplicator, Operation, OperationData, OperationDataStream,
+        StateProvider,
     },
 };
+use serde::{Deserialize, Serialize};
 use tokio::{select, sync::Mutex};
 use tokio_util::sync::CancellationToken;
 use tracing::{error, info};
 use windows_core::Interface;
 
-use crate::data::CountingOperationDataStream;
+use crate::{app::KvApp, data::VecOperationDataStream, ProcCtx};
 
 pub struct Factory {
-    replication_port: u32,
-    rt: DefaultExecutor,
+    ctx: ProcCtx,
 }
 
 impl Factory {
-    pub fn create(replication_port: u32, rt: DefaultExecutor) -> Self {
-        Self {
-            replication_port,
-            rt,
-        }
+    pub fn create(ctx: ProcCtx) -> Self {
+        Self { ctx }
     }
 }
 
@@ -59,19 +57,22 @@ impl StatefulServiceFactory for Factory {
           initializationdata.len(),
           partitionid
         );
-        Ok(Replica::create(self.replication_port, self.rt.clone()))
+        Ok(Replica::create(self.ctx.clone()))
     }
 }
 
 #[derive(Clone)]
 pub struct ReplicaState {
+    // for fast in mem lookup
     lsn: Arc<std::sync::Mutex<Cell<i64>>>,
+    app: Arc<KvApp>,
 }
 
 impl ReplicaState {
     fn create() -> Self {
         Self {
             lsn: Arc::new(std::sync::Mutex::new(Cell::new(0))),
+            app: Arc::new(KvApp::create()),
         }
     }
 
@@ -90,20 +91,80 @@ impl ReplicaState {
         prev
     }
 
-    // async fn get(&self) -> i64 {
-    //     let lsn = self.lsn.lock().await;
-    //     lsn.get()
-    // }
+    // // async fn get(&self) -> i64 {
+    // //     let lsn = self.lsn.lock().await;
+    // //     lsn.get()
+    // // }
 
     fn get_sync(&self) -> i64 {
         let lk = self.lsn.lock().unwrap();
         lk.get()
     }
+
+    // from primary
+    fn get_copy_state(
+        &self,
+        up_to_sequence_number: i64,
+        ctx_stream: impl OperationDataStream,
+    ) -> impl OperationDataStream {
+        CopyStateStream {
+            state: self.app.clone(),
+            up_to_sequence_number,
+            ctx_stream,
+        }
+    }
+}
+
+// determines what to copy to secondary
+struct CopyStateStream<T: OperationDataStream> {
+    state: Arc<KvApp>,
+    up_to_sequence_number: i64,
+    ctx_stream: T,
+}
+
+// payload of copy state
+#[derive(Serialize, Deserialize)]
+struct CopyStatePayload {
+    sn: i64,
+    data: String,
+}
+
+impl<T: OperationDataStream> OperationDataStream for CopyStateStream<T> {
+    async fn get_next(&self) -> mssf_core::Result<Option<impl OperationData>> {
+        // if ctx stream is end we end as well.
+        let ctx = self.ctx_stream.get_next().await?;
+        if ctx.is_none() {
+            return Ok(None);
+        }
+        let mut ctx_data = ctx.unwrap();
+        let cb = ctx_data.copy_to_bytes(ctx_data.remaining());
+        let s = String::from_utf8_lossy(&cb).into_owned();
+        let peer_lsn = s.parse::<i64>().unwrap();
+        // get current lsn
+        let (lsn, data) = self.state.get_data().await.unwrap();
+        #[allow(clippy::comparison_chain)]
+        if lsn == peer_lsn {
+            // peer is already upto date
+            Ok(None)
+        } else if lsn > peer_lsn {
+            if self.up_to_sequence_number < peer_lsn {
+                // peer has already caught up than the sync point
+                return Ok(None);
+            } else {
+                // send data and lsn
+                let p = CopyStatePayload { sn: lsn, data };
+                return Ok(Some(OperationDataBuf::new(Bytes::from(
+                    serde_json::to_string(&p).unwrap(),
+                ))));
+            }
+        } else {
+            panic!("peer is more advanced than primary {lsn}, {peer_lsn}");
+        }
+    }
 }
 
 pub struct Replica {
-    replication_port: u32,
-    rt: DefaultExecutor,
+    ctx: ProcCtx,
     state_replicator: Mutex<Cell<Option<StateReplicatorProxy>>>,
     cancel: Mutex<Cell<Option<CancellationToken>>>,
     state: ReplicaState,
@@ -111,10 +172,9 @@ pub struct Replica {
 }
 
 impl Replica {
-    fn create(replication_port: u32, rt: DefaultExecutor) -> Self {
+    fn create(ctx: ProcCtx) -> Self {
         Self {
-            replication_port,
-            rt,
+            ctx,
             state_replicator: Mutex::new(Cell::new(None)),
             cancel: Mutex::new(Cell::new(None)),
             state: ReplicaState::create(),
@@ -126,19 +186,19 @@ impl Replica {
 impl StatefulServiceReplica for Replica {
     async fn open(
         &self,
-        _openmode: OpenMode,
+        openmode: OpenMode,
         partition: &StatefulServicePartition,
     ) -> mssf_core::Result<impl PrimaryReplicator> {
         let com = partition.get_com();
 
-        let stateprovider = KvStateProvider::create(self.rt.clone(), self.state.clone());
+        let stateprovider = KvStateProvider::create(self.ctx.rt.clone(), self.state.clone());
         let stateprovider_bridge: IFabricStateProvider =
-            StateProviderBridge::new(stateprovider, self.rt.clone()).into();
+            StateProviderBridge::new(stateprovider, self.ctx.rt.clone()).into();
 
         let mut rplctr;
         let state_rplctr;
         {
-            let addr = HSTRING::from(format!("{}:{}", "localhost", self.replication_port));
+            let addr = HSTRING::from(format!("{}:{}", "localhost", self.ctx.replication_port));
             let settings = FABRIC_REPLICATOR_SETTINGS {
                 Flags: FABRIC_REPLICATOR_ADDRESS.0 as u32,
                 ReplicatorAddress: mssf_core::PCWSTR(addr.as_ptr()),
@@ -166,6 +226,23 @@ impl StatefulServiceReplica for Replica {
             state_rplctr.cast().unwrap(),
         )));
         assert!(prev.is_none());
+
+        self.state
+            .app
+            .open(&self.ctx.workdir)
+            .await
+            .inspect_err(|e| error!("Fail to open app db {e}"))?;
+
+        // init db if it first time
+        if openmode as u8 == OpenMode::New as u8 {
+            self.state
+                .app
+                .set_data(0, "InitData".to_string())
+                .await
+                .inspect_err(|e| {
+                    error!("fail to init data {}", e);
+                })?;
+        }
 
         // initiate the cancel token for closing.
         //let token = CancellationToken::new();
@@ -209,7 +286,7 @@ impl StatefulServiceReplica for Replica {
         match newrole {
             Role::ActiveSecondary => {
                 // Handle replicate stream from primary
-                self.rt.spawn(async move {
+                self.ctx.rt.spawn(async move {
                     let rplct_stream = sr.get_replication_stream().unwrap();
                     loop {
                         let opt = select! {
@@ -226,24 +303,31 @@ impl StatefulServiceReplica for Replica {
                         // apply the data with lsn
                         let op = opt.unwrap();
                         let lsn = op.get_metadate().sequence_number;
-                        let prev_lsn = state.apply(lsn);
                         let b = op.get_data().unwrap();
                         let s = String::from_utf8_lossy(b.chunk()).into_owned();
+                        state.apply(lsn);
+                        state.app.set_data(lsn, s.clone()).await.unwrap();
                         op.acknowledge().unwrap();
-                        info!("rplct_stream: {}, lsn: {}, prev: {}", s, lsn, prev_lsn);
+                        info!("rplct_stream: data: {}, lsn: {}", s, lsn);
                     }
                 });
             }
             Role::IdleSecondary => {
-                self.rt.spawn(async move {
+                self.ctx.rt.spawn(async move {
                     // handle copying. i.e. catch up from primary. The stream is from copy_state from primary
                     let copy_stream = sr.get_copy_stream().unwrap();
                     while let Some(c) = copy_stream.get_operation().await.unwrap() {
                         let b = c.get_data().unwrap();
                         let s = String::from_utf8_lossy(b.chunk()).into_owned();
-                        info!("KvStateProvider::change_role: copy_stream: {}", s);
+                        let p: CopyStatePayload = serde_json::from_str(&s).unwrap();
+                        state.apply(p.sn);
+                        state.app.set_data(p.sn, p.data.clone()).await.unwrap();
                         // ack the data is applied
                         c.acknowledge().unwrap();
+                        info!(
+                            "KvStateProvider::change_role: copy_stream: data: {} sn: {}",
+                            p.data, p.sn
+                        );
                     }
                     info!("KvStateProvider: Completed copy stream catchup on idle secondary.")
                 })
@@ -253,7 +337,7 @@ impl StatefulServiceReplica for Replica {
             }
             Role::Primary => {
                 // start replicate?
-                self.rt.spawn(async move {
+                self.ctx.rt.spawn(async move {
                     let mut i = 0;
                     loop {
                         select! {
@@ -264,12 +348,13 @@ impl StatefulServiceReplica for Replica {
                             _ = tokio::time::sleep(std::time::Duration::from_secs(15)) => {}
                         };
                         let mut out = 0_i64;
-                        let data =
-                            OperationDataBuf::new(Bytes::from(format!("replicate-data-{i}")));
-                        let out2 = sr.replicate(data, &mut out).await.unwrap();
-                        assert_eq!(out, out2);
-                        let prev = state.apply(out);
-                        info!("replicated lsn {out}, prev {prev}");
+                        let data = format!("replicate-data-{i}");
+                        let buf = OperationDataBuf::new(Bytes::from(data.clone()));
+                        let sn = sr.replicate(buf, &mut out).await.unwrap();
+                        assert_eq!(out, sn);
+                        state.apply(sn);
+                        state.app.set_data(sn, data.clone()).await.unwrap();
+                        info!("replicated lsn {out}, data: {data}");
                         i += 1;
                     }
                 })
@@ -298,13 +383,13 @@ impl StatefulServiceReplica for Replica {
 }
 
 pub struct KvStateProvider {
-    rt: DefaultExecutor,
+    _rt: DefaultExecutor,
     state: ReplicaState,
 }
 
 impl KvStateProvider {
     fn create(rt: DefaultExecutor, state: ReplicaState) -> Self {
-        Self { rt, state }
+        Self { _rt: rt, state }
     }
 }
 
@@ -334,7 +419,11 @@ impl StateProvider for KvStateProvider {
     // invoked on secondary.
     fn get_copy_context(&self) -> mssf_core::Result<impl OperationDataStream> {
         info!("KvStateProvider::get_copy_state: get_copy_context");
-        Ok(CountingOperationDataStream::new(3, "copycontext"))
+        // just return the current lsn from secondary to primary
+        let lsn = self.state.get_sync();
+        Ok(VecOperationDataStream::new(vec![OperationDataBuf::new(
+            Bytes::from(lsn.to_string()),
+        )]))
     }
 
     // Invoked on primary. Data stream from above get_copy_context from secondary is presented here.
@@ -343,27 +432,12 @@ impl StateProvider for KvStateProvider {
         upto_sequence_number: i64,
         copy_context_stream: impl OperationDataStream,
     ) -> mssf_core::Result<impl OperationDataStream> {
-        // copy context should be from secondary
-        // read the context in background
-        self.rt.spawn(async move {
-            // read the context stream.
-            while let Some(mut c) = copy_context_stream.get_next().await.unwrap() {
-                let b = c.copy_to_bytes(c.remaining());
-                let s = String::from_utf8_lossy(&b).into_owned();
-                info!(
-                    "KvStateProvider::get_copy_state: copy_context_stream: {}",
-                    s
-                );
-            }
-        });
         info!(
             "KvStateProvider::get_copy_state: lsn upto {upto_sequence_number}, current lsn {}",
             self.state.get_sync()
         );
-        // returned stream should be copy to secondary
-        Ok(CountingOperationDataStream::new(
-            upto_sequence_number as usize,
-            "copystate",
-        ))
+        Ok(self
+            .state
+            .get_copy_state(upto_sequence_number, copy_context_stream))
     }
 }

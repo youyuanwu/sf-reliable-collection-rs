@@ -1,5 +1,8 @@
+pub mod app;
 pub mod data;
 pub mod kvmap;
+
+use std::path::PathBuf;
 
 use kvmap::Factory;
 use mssf_core::{
@@ -8,6 +11,7 @@ use mssf_core::{
         executor::{DefaultExecutor, Executor},
         ActivationContext,
     },
+    strings::HSTRINGWrap,
     HSTRING,
 };
 use tracing::info;
@@ -20,6 +24,14 @@ fn has_debug_arg() -> bool {
         }
     }
     false
+}
+
+// ctx info for the app.
+#[derive(Clone)]
+pub struct ProcCtx {
+    rt: DefaultExecutor,
+    replication_port: u32,
+    workdir: PathBuf,
 }
 
 fn main() -> mssf_core::Result<()> {
@@ -36,8 +48,14 @@ fn main() -> mssf_core::Result<()> {
     let endpoint = actctx
         .get_endpoint_resource(&HSTRING::from("KvReplicatorEndpoint"))
         .unwrap();
+    let work_dir: HSTRINGWrap = unsafe { actctx.get_com().get_WorkDirectory() }.into();
+    let ctx = ProcCtx {
+        rt: e.clone(),
+        replication_port: endpoint.Port,
+        workdir: PathBuf::from(HSTRING::from(work_dir).to_string()),
+    };
 
-    let factory = Factory::create(endpoint.Port, e.clone());
+    let factory = Factory::create(ctx);
     runtime
         .register_stateful_service_factory(&HSTRING::from("KvMapService"), factory)
         .unwrap();

@@ -53,6 +53,14 @@ pub trait LocalStateProvider: Sync + 'static {
     /// When the Primary replica receives this call, it should create and return another
     /// OperationDataStream that contains OperationData.
     /// OperationData represents the data/state that the Secondary replica
+    ///
+    /// Parameters:
+    /// upToSequenceNumber - The maximum last sequence number (LSN) that should be
+    /// placed in the copy stream via the getCopyStream() method.
+    /// LSNs greater than this number are delivered to the Secondary replica as a
+    /// part of the replication stream via the getReplicationStream() method.
+    /// copyContext - An OperationDataStream that contains the OperationData
+    /// objects that are created by the Secondary replica. requires to catch up to the provided
     fn get_copy_state(
         &self,
         upto_sequence_number: i64,
@@ -139,7 +147,7 @@ pub trait Operation: Send {
     fn get_metadate(&self) -> OperationMetadata;
 
     /// Gets the OperationData that are provided by the Primary replica.
-    fn get_data(&self) -> mssf_core::Result<impl Buf>;
+    fn get_data(&self) -> mssf_core::Result<impl Buf + Send>;
 
     /// Acknowledges that this operation has been successfully applied at the Secondary replica.
     /// Remarks:Services should call this method when they have obtained

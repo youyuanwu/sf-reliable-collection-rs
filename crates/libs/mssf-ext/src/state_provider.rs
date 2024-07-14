@@ -13,7 +13,7 @@ use tracing::info;
 use windows_core::{implement, AsImpl};
 
 use crate::{
-    stream::{OpeartionDataStreamBridge, OpeartionDataStreamProxy},
+    stream::{OpeartionDataStreamBridge, OperationDataStreamProxy},
     traits::StateProvider,
 };
 
@@ -133,7 +133,7 @@ impl<T: StateProvider, E: Executor> IFabricStateProvider_Impl for StateProviderB
         uptosequencenumber: i64,
         copycontextstream: Option<&IFabricOperationDataStream>,
     ) -> windows_core::Result<IFabricOperationDataStream> {
-        let proxy = OpeartionDataStreamProxy::new(copycontextstream.unwrap().clone());
+        let proxy = OperationDataStreamProxy::new(copycontextstream.unwrap().clone());
         let stream = self.inner.get_copy_state(uptosequencenumber, proxy)?;
 
         let bridge = OpeartionDataStreamBridge::new(stream, self.rt.clone()).into();
