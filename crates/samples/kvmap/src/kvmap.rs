@@ -170,7 +170,10 @@ impl<T: OperationDataStream> OperationDataStream for CopyStateStream<T> {
 pub struct Replica {
     ctx: ProcCtx,
     state_replicator: Mutex<Cell<Option<StateReplicatorProxy>>>,
-    cancel: Mutex<Cell<Option<CancellationToken>>>,
+    // cancel background work
+    background_cancel: Mutex<Cell<Option<CancellationToken>>>,
+    // cancel rpc server
+    rpc_cancel: Mutex<Cell<Option<CancellationToken>>>,
     state: ReplicaState,
     role: Mutex<Cell<Role>>,
 }
@@ -180,7 +183,8 @@ impl Replica {
         Self {
             ctx,
             state_replicator: Mutex::new(Cell::new(None)),
-            cancel: Mutex::new(Cell::new(None)),
+            background_cancel: Mutex::new(Cell::new(None)),
+            rpc_cancel: Mutex::new(Cell::new(None)),
             state: ReplicaState::create(),
             role: Mutex::new(Cell::new(Role::Unknown)),
         }
@@ -248,12 +252,12 @@ impl StatefulServiceReplica for Replica {
             state_rplctr = res.unwrap();
         }
         // save the state replicator in self
-        let sr = self.state_replicator.lock().await;
-        let prev = sr.replace(Some(StateReplicatorProxy::new(
-            state_rplctr.cast().unwrap(),
-        )));
-        assert!(prev.is_none());
-
+        let sr = StateReplicatorProxy::new(state_rplctr.cast().unwrap());
+        {
+            let lk = self.state_replicator.lock().await;
+            let prev = lk.replace(Some(sr.clone()));
+            assert!(prev.is_none());
+        }
         self.state
             .app
             .open(&self.ctx.workdir)
@@ -272,11 +276,23 @@ impl StatefulServiceReplica for Replica {
         }
 
         // initiate the cancel token for closing.
-        let new_token = CancellationToken::new();
-        let token = self.cancel.lock().await;
-        let prev = token.replace(Some(new_token));
-        assert!(prev.is_none());
+        // let new_token = CancellationToken::new();
+        // let token = self.background_cancel.lock().await;
+        // let prev = token.replace(Some(new_token));
+        // assert!(prev.is_none());
 
+        // initiate the rpc server token
+        let rpc_token = CancellationToken::new();
+        let new_svc_token = rpc_token.child_token();
+        {
+            let token = self.rpc_cancel.lock().await;
+            let prev = token.replace(Some(rpc_token));
+            assert!(prev.is_none());
+        }
+        // start rpc server
+        let app = self.state.app.clone();
+        let svc_addr = format!("[::1]:{}", self.ctx.rpc_port);
+        Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
         // return the replicator.
         let rplctr = rplctr.unwrap().cast().unwrap();
         let proxy = PrimaryReplicatorProxy::new(rplctr);
@@ -303,28 +319,24 @@ impl StatefulServiceReplica for Replica {
             return Ok(addr_res);
         }
 
+        // init or re-init background token
+        let token = CancellationToken::new();
         if !matches!(curr_role, Role::None | Role::Unknown) {
             // has background stuff running, cancel it
-            let mut lk = self.cancel.lock().await;
+            let mut lk = self.background_cancel.lock().await;
             // cancel the prev token and init a new one
-            let prev = lk.get_mut().replace(CancellationToken::new());
+            let prev = lk.get_mut().replace(token.clone());
             prev.unwrap().cancel();
         };
 
-        let token = self.cancel.lock().await.get_mut().clone().unwrap();
         let state = self.state.clone();
-        let new_svc_token = token.child_token();
-
-        let app = self.state.app.clone();
-        let sr2 = sr.clone();
-
         match newrole {
             Role::ActiveSecondary => {
                 // start rpc server on secondary
-                Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
+                // Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
                 // Handle replicate stream from primary
                 self.ctx.rt.spawn(async move {
-                    let rplct_stream = sr2.get_replication_stream().unwrap();
+                    let rplct_stream = sr.get_replication_stream().unwrap();
                     loop {
                         let opt = select! {
                             _ = token.cancelled() => { None }
@@ -374,7 +386,7 @@ impl StatefulServiceReplica for Replica {
             }
             Role::Primary => {
                 // start rpc server on primary
-                Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
+                // Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
                 // start replicate?
                 // self.ctx.rt.spawn(async move {
                 //     let mut i = 0;
@@ -400,18 +412,35 @@ impl StatefulServiceReplica for Replica {
     }
 
     async fn close(&self) -> mssf_core::Result<()> {
-        let token = self.cancel.lock().await.get_mut().clone();
-        if let Some(t) = token {
-            t.cancel();
+        // cancel background
+        {
+            let token = self.background_cancel.lock().await.take();
+            if let Some(t) = token {
+                t.cancel();
+            }
+        }
+        // cancel rpc
+        {
+            let token = self.rpc_cancel.lock().await.take();
+            if let Some(t) = token {
+                t.cancel();
+            }
         }
         Ok(())
     }
 
     fn abort(&self) {
         // cancel but sync. This is in SF thread pool.
-        let token = self.cancel.blocking_lock().get_mut().clone();
+        let token = self.background_cancel.blocking_lock().take();
         if let Some(t) = token {
             t.cancel();
+        }
+        // cancel rpc
+        {
+            let token = self.rpc_cancel.blocking_lock().take();
+            if let Some(t) = token {
+                t.cancel();
+            }
         }
     }
 }

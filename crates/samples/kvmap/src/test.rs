@@ -68,19 +68,23 @@ async fn read_write_test() {
 
         // read from primary
         {
-          let req2 = tonic::Request::new(EmptyPayload {});
-          let response2 = client.get_data(req2).await.expect("rpc faile").into_inner();
-          assert_eq!(response2.data, data);
-          assert_eq!(sn, response2.sn);
-          println!("RESPONSE={:?}", response2);
+            let req2 = tonic::Request::new(EmptyPayload {});
+            let response2 = client.get_data(req2).await.expect("rpc faile").into_inner();
+            assert_eq!(response2.data, data);
+            assert_eq!(sn, response2.sn);
+            println!("RESPONSE={:?}", response2);
         }
         // read from secondary
         {
-          let req2 = tonic::Request::new(EmptyPayload {});
-          let response2 = sec_client.get_data(req2).await.expect("rpc faile").into_inner();
-          assert_eq!(response2.data, data);
-          assert_eq!(sn, response2.sn);
-          println!("RESPONSE={:?}", response2);
+            let req2 = tonic::Request::new(EmptyPayload {});
+            let response2 = sec_client
+                .get_data(req2)
+                .await
+                .expect("rpc faile")
+                .into_inner();
+            assert_eq!(response2.data, data);
+            assert_eq!(sn, response2.sn);
+            println!("RESPONSE={:?}", response2);
         }
     }
 }
