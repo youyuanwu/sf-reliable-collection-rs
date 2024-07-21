@@ -1,16 +1,16 @@
 use std::sync::Arc;
 
 use mssf_com::{
-    FabricCommon::{
-        IFabricAsyncOperationCallback, IFabricAsyncOperationContext,
-        IFabricAsyncOperationContext_Impl,
-    },
+    FabricCommon::{IFabricAsyncOperationCallback, IFabricAsyncOperationContext},
     FabricRuntime::{IFabricOperationDataStream, IFabricStateProvider, IFabricStateProvider_Impl},
     FabricTypes::FABRIC_EPOCH,
 };
-use mssf_core::runtime::{bridge::BridgeContext, executor::Executor, stateful_types::Epoch};
+use mssf_core::{
+    runtime::{executor::Executor, stateful_types::Epoch},
+    sync::{fabric_begin_bridge, fabric_end_bridge},
+};
 use tracing::info;
-use windows_core::{implement, AsImpl};
+use windows_core::implement;
 
 use crate::{
     stream::{OpeartionDataStreamBridge, OperationDataStreamProxy},
@@ -51,25 +51,13 @@ impl<T: StateProvider, E: Executor> IFabricStateProvider_Impl for StateProviderB
         callback: Option<&IFabricAsyncOperationCallback>,
     ) -> windows_core::Result<IFabricAsyncOperationContext> {
         info!("StateProviderBridge::BeginUpdateEpoch");
-        let inner_cp = self.inner.clone();
-        let callback_cp = callback.unwrap().clone();
-
-        let ctx: IFabricAsyncOperationContext =
-            BridgeContext::<mssf_core::Result<()>>::new(callback_cp).into();
-
         let epoch2 = Epoch::from(unsafe { epoch.as_ref().unwrap() });
-
-        let ctx_cpy = ctx.clone();
-        self.rt.spawn(async move {
-            let ok = inner_cp
+        let inner = self.inner.clone();
+        fabric_begin_bridge(&self.rt, callback, async move {
+            inner
                 .update_epoch(&epoch2, previousepochlastsequencenumber)
-                .await;
-            let ctx_bridge: &BridgeContext<mssf_core::Result<()>> = unsafe { ctx_cpy.as_impl() };
-            ctx_bridge.set_content(ok);
-            let cb = ctx_bridge.Callback().unwrap();
-            unsafe { cb.Invoke(&ctx_cpy) };
-        });
-        Ok(ctx)
+                .await
+        })
     }
 
     fn EndUpdateEpoch(
@@ -77,10 +65,7 @@ impl<T: StateProvider, E: Executor> IFabricStateProvider_Impl for StateProviderB
         context: Option<&IFabricAsyncOperationContext>,
     ) -> windows_core::Result<()> {
         info!("StateProviderBridge::EndUpdateEpoch");
-        let ctx_bridge: &BridgeContext<mssf_core::Result<()>> =
-            unsafe { context.unwrap().as_impl() };
-        ctx_bridge.consume_content()?;
-        Ok(())
+        fabric_end_bridge(context)
     }
 
     fn GetLastCommittedSequenceNumber(&self) -> windows_core::Result<i64> {
@@ -91,35 +76,19 @@ impl<T: StateProvider, E: Executor> IFabricStateProvider_Impl for StateProviderB
         &self,
         callback: Option<&IFabricAsyncOperationCallback>,
     ) -> windows_core::Result<IFabricAsyncOperationContext> {
-        let inner_cp = self.inner.clone();
-        let callback_cp = callback.unwrap().clone();
-
-        let ctx: IFabricAsyncOperationContext =
-            BridgeContext::<mssf_core::Result<bool>>::new(callback_cp).into();
-
-        let ctx_cpy = ctx.clone();
-        self.rt.spawn(async move {
-            let ok = inner_cp.on_data_loss().await;
-            let ctx_bridge: &BridgeContext<mssf_core::Result<bool>> = unsafe { ctx_cpy.as_impl() };
-            ctx_bridge.set_content(ok);
-            let cb = ctx_bridge.Callback().unwrap();
-            unsafe { cb.Invoke(&ctx_cpy) };
-        });
-        Ok(ctx)
+        let inner = self.inner.clone();
+        fabric_begin_bridge(
+            &self.rt,
+            callback,
+            async move { inner.on_data_loss().await },
+        )
     }
 
     fn EndOnDataLoss(
         &self,
         context: Option<&IFabricAsyncOperationContext>,
     ) -> windows_core::Result<u8> {
-        let ctx_bridge: &BridgeContext<mssf_core::Result<bool>> =
-            unsafe { context.unwrap().as_impl() };
-        let changed = ctx_bridge.consume_content()?;
-        let out = match changed {
-            true => 1,
-            false => 0,
-        };
-        Ok(out)
+        fabric_end_bridge(context)
     }
 
     fn GetCopyContext(&self) -> windows_core::Result<IFabricOperationDataStream> {

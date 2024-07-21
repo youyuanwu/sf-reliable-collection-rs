@@ -55,7 +55,7 @@ fn main() -> windows::core::Result<()> {
         .get_endpoint_resource(&HSTRING::from("GrpcEndpoint"))
         .unwrap();
 
-    let factory = Factory::create(rplctr_endpoint.Port, grpc_endpoint.Port, e.clone());
+    let factory = Factory::create(rplctr_endpoint.port, grpc_endpoint.port, e.clone());
     runtime
         .register_stateful_service_factory(&HSTRING::from("RcStoreService"), factory)
         .unwrap();
