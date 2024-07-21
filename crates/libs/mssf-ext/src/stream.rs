@@ -9,7 +9,7 @@ use mssf_com::{
 };
 use mssf_core::{
     runtime::executor::Executor,
-    sync::{fabric_begin_bridge, fabric_end_bridge},
+    sync::{fabric_begin_bridge, fabric_begin_end_proxy, fabric_end_bridge},
 };
 use windows_core::{implement, Interface};
 
@@ -54,25 +54,7 @@ impl<T: OperationDataStream, E: Executor> IFabricOperationDataStream_Impl
                     |x| IFabricOperationData::from(OperationDataBridge::new(x)),
                 )
             })
-            //.unwrap_or(Ok(unsafe { IFabricOperationData::from_raw(std::ptr::null_mut()) }));
         })
-
-        // let ctx: IFabricAsyncOperationContext =
-        //     BridgeContext::<mssf_core::Result<IFabricOperationData>>::new(callback_cp).into();
-
-        // let ctx_cpy = ctx.clone();
-        // self.rt.spawn(async move {
-        //     let ok = inner_cp.get_next().await;
-        //     let ctx_bridge: &BridgeContext<mssf_core::Result<Option<IFabricOperationData>>> =
-        //         unsafe { ctx_cpy.as_impl() };
-        //     // convert end of stream of none
-        //     let data_bridge =
-        //         ok.map(|opt| opt.map(|x| IFabricOperationData::from(OperationDataBridge::new(x))));
-        //     ctx_bridge.set_content(data_bridge);
-        //     let cb = ctx_bridge.Callback().unwrap();
-        //     unsafe { cb.Invoke(&ctx_cpy) };
-        // });
-        // Ok(ctx)
     }
 
     fn EndGetNext(
@@ -80,17 +62,6 @@ impl<T: OperationDataStream, E: Executor> IFabricOperationDataStream_Impl
         context: Option<&IFabricAsyncOperationContext>,
     ) -> windows_core::Result<IFabricOperationData> {
         fabric_end_bridge(context)
-        // let ctx_bridge: &BridgeContext<mssf_core::Result<Option<IFabricOperationData>>> =
-        //     unsafe { context.unwrap().as_impl() };
-        // // return nullptr is opt is none for end of stream.
-        // let opt = ctx_bridge.consume_content()?;
-        // match opt {
-        //     Some(data) => Ok(data),
-        //     // Returns a nullptr for the caller. The com is detached and no ref count missed.
-        //     // This is a special API, the caller needs to check the returned obj and mem::forget
-        //     // the com obj to avoid refcount error.
-        //     None => Ok(unsafe { IFabricOperationData::from_raw(std::ptr::null_mut()) }),
-        // }
     }
 }
 
@@ -106,21 +77,14 @@ impl OperationDataStreamProxy {
 
 impl OperationDataStream for OperationDataStreamProxy {
     async fn get_next(&self) -> mssf_core::Result<Option<impl OperationData>> {
-        // get the data from com
-        let (tx, rx) = tokio::sync::oneshot::channel();
-        let com_cp = self.com_impl.clone();
-        let callback = mssf_core::sync::AwaitableCallback2::i_new(move |ctx| {
-            // This is a special api where next can be null. windows-rs will make a empty error.
-            // See windows_core::Type::from_abi(result__) impl.
-            let res = unsafe { com_cp.EndGetNext(ctx) };
-            // empty error is handled at the rx location
-            if tx.send(res).is_err() {
-                debug_assert!(false, "Receiver is dropped.");
-            }
-        });
-
-        let _ = unsafe { self.com_impl.BeginGetNext(&callback)? };
-        let res = rx.await.unwrap();
+        let com1 = &self.com_impl;
+        let com2 = self.com_impl.clone();
+        let res = fabric_begin_end_proxy(
+            move |callback| unsafe {
+                com1.BeginGetNext(callback)
+            },
+            move |ctx| unsafe { com2.EndGetNext(ctx) },
+        ).await;
         match res {
             Ok(data) => {
                 let proxy = OperationDataProxy::new(data)?;
@@ -151,16 +115,14 @@ impl OperationStreamProxy {
 
 impl OperationStream for OperationStreamProxy {
     async fn get_operation(&self) -> mssf_core::Result<Option<impl Operation>> {
-        let (tx, rx) = tokio::sync::oneshot::channel();
-        let com_cp = self.com_impl.clone();
-        let callback = mssf_core::sync::AwaitableCallback2::i_new(move |ctx| {
-            let res = unsafe { com_cp.EndGetOperation(ctx) };
-            if tx.send(res).is_err() {
-                debug_assert!(false, "Receiver is dropped.");
-            }
-        });
-        let _ = unsafe { self.com_impl.BeginGetOperation(&callback)? };
-        let res = rx.await.unwrap();
+        let com1 = &self.com_impl;
+        let com2 = self.com_impl.clone();
+        let res = fabric_begin_end_proxy(
+            move |callback| unsafe {
+                com1.BeginGetOperation(callback)
+            },
+            move |ctx| unsafe { com2.EndGetOperation(ctx) },
+        ).await;
         match res {
             Ok(op) => {
                 let proxy = OperationProxy::new(op);
