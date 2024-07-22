@@ -720,8 +720,8 @@ dependencies = [
 
 [[package]]
 name = "mssf-com"
-version = "0.0.7"
-source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a#3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"
+version = "0.0.8"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=dd46f7ea733892a57452c4d6389ae1fcdd4d2024#dd46f7ea733892a57452c4d6389ae1fcdd4d2024"
 dependencies = [
  "mssf-metadata",
  "mssf-pal",
@@ -731,8 +731,8 @@ dependencies = [
 
 [[package]]
 name = "mssf-core"
-version = "0.0.7"
-source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a#3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"
+version = "0.0.8"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=dd46f7ea733892a57452c4d6389ae1fcdd4d2024#dd46f7ea733892a57452c4d6389ae1fcdd4d2024"
 dependencies = [
  "bitflags 2.5.0",
  "config",
@@ -766,8 +766,8 @@ checksum = "39323a0ee935ad85894e31a9f42f2f41f5db403b7d2312d85e77b5a99eb8552d"
 
 [[package]]
 name = "mssf-pal"
-version = "0.0.7"
-source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a#3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"
+version = "0.0.8"
+source = "git+https://github.com/youyuanwu/service-fabric-rs-fork.git?rev=dd46f7ea733892a57452c4d6389ae1fcdd4d2024#dd46f7ea733892a57452c4d6389ae1fcdd4d2024"
 dependencies = [
  "libc",
  "windows",

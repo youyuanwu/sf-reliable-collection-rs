@@ -58,8 +58,8 @@ fn main() -> mssf_core::Result<()> {
     let work_dir: HSTRINGWrap = unsafe { actctx.get_com().get_WorkDirectory() }.into();
     let ctx = ProcCtx {
         rt: e.clone(),
-        replication_port: endpoint.Port,
-        rpc_port: rpc_endpoint.Port,
+        replication_port: endpoint.port,
+        rpc_port: rpc_endpoint.port,
         workdir: PathBuf::from(HSTRING::from(work_dir).to_string()),
     };
 

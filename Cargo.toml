@@ -7,8 +7,8 @@ members = [
 ]
 
 [workspace.dependencies]
-mssf-com = {version = "0.0.7"}
-mssf-core = "0.0.7"
+mssf-com = {version = "0.0.8"}
+mssf-core = "0.0.8"
 windows = {version = "0.57", features = [ "Win32_Foundation" ]}
 windows-core = { version = "0.57" }
 tracing = { version = "0.1.40", features = ["log"] }
@@ -22,5 +22,5 @@ serde = {version = "1", features = ["derive"]}
 
 # testing code not released in cargo yet
 [patch.crates-io]
-mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"}
-mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "3e5e0d7f056ce5d706f1e7bb69cf9db68214e76a"}
+mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "dd46f7ea733892a57452c4d6389ae1fcdd4d2024"}
+mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "dd46f7ea733892a57452c4d6389ae1fcdd4d2024"}

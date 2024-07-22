@@ -13,8 +13,9 @@ use mssf_core::{
             StatefulServiceReplica,
         },
         stateful_proxy::PrimaryReplicatorProxy,
-        stateful_types::{Epoch, OpenMode, Role},
+        stateful_types::{Epoch, OpenMode},
     },
+    types::ReplicaRole,
     GUID, HSTRING,
 };
 use mssf_ext::{
@@ -175,7 +176,7 @@ pub struct Replica {
     // cancel rpc server
     rpc_cancel: Mutex<Cell<Option<CancellationToken>>>,
     state: ReplicaState,
-    role: Mutex<Cell<Role>>,
+    role: Mutex<Cell<ReplicaRole>>,
 }
 
 impl Replica {
@@ -186,7 +187,7 @@ impl Replica {
             background_cancel: Mutex::new(Cell::new(None)),
             rpc_cancel: Mutex::new(Cell::new(None)),
             state: ReplicaState::create(),
-            role: Mutex::new(Cell::new(Role::Unknown)),
+            role: Mutex::new(Cell::new(ReplicaRole::Unknown)),
         }
     }
 
@@ -299,7 +300,7 @@ impl StatefulServiceReplica for Replica {
         Ok(proxy)
     }
 
-    async fn change_role(&self, newrole: Role) -> mssf_core::Result<HSTRING> {
+    async fn change_role(&self, newrole: ReplicaRole) -> mssf_core::Result<HSTRING> {
         // get the state replicator opened.
         let sr = self
             .state_replicator
@@ -321,7 +322,7 @@ impl StatefulServiceReplica for Replica {
 
         // init or re-init background token
         let token = CancellationToken::new();
-        if !matches!(curr_role, Role::None | Role::Unknown) {
+        if !matches!(curr_role, ReplicaRole::None | ReplicaRole::Unknown) {
             // has background stuff running, cancel it
             let mut lk = self.background_cancel.lock().await;
             // cancel the prev token and init a new one
@@ -331,7 +332,7 @@ impl StatefulServiceReplica for Replica {
 
         let state = self.state.clone();
         match newrole {
-            Role::ActiveSecondary => {
+            ReplicaRole::ActiveSecondary => {
                 // start rpc server on secondary
                 // Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
                 // Handle replicate stream from primary
@@ -361,7 +362,7 @@ impl StatefulServiceReplica for Replica {
                     }
                 });
             }
-            Role::IdleSecondary => {
+            ReplicaRole::IdleSecondary => {
                 self.ctx.rt.spawn(async move {
                     // handle copying. i.e. catch up from primary. The stream is from copy_state from primary
                     let copy_stream = sr.get_copy_stream().unwrap();
@@ -381,10 +382,10 @@ impl StatefulServiceReplica for Replica {
                     info!("KvStateProvider: Completed copy stream catchup on idle secondary.")
                 })
             }
-            Role::None => {
+            ReplicaRole::None => {
                 // delete stuff on disk?
             }
-            Role::Primary => {
+            ReplicaRole::Primary => {
                 // start rpc server on primary
                 // Self::start_rpc(self.ctx.rt.clone(), sr, app, svc_addr, new_svc_token);
                 // start replicate?
@@ -406,7 +407,7 @@ impl StatefulServiceReplica for Replica {
                 //     }
                 // })
             }
-            Role::Unknown => panic!("Unknonw role"),
+            ReplicaRole::Unknown => panic!("Unknonw role"),
         }
         Ok(addr_res)
     }

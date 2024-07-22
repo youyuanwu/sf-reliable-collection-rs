@@ -1,17 +1,17 @@
 use std::sync::Arc;
 
 use mssf_com::{
-    FabricCommon::{
-        IFabricAsyncOperationCallback, IFabricAsyncOperationContext,
-        IFabricAsyncOperationContext_Impl,
-    },
+    FabricCommon::{IFabricAsyncOperationCallback, IFabricAsyncOperationContext},
     FabricRuntime::{
         IFabricOperationData, IFabricOperationDataStream, IFabricOperationDataStream_Impl,
         IFabricOperationStream2,
     },
 };
-use mssf_core::runtime::{bridge::BridgeContext, executor::Executor};
-use windows_core::{implement, AsImpl, Interface};
+use mssf_core::{
+    runtime::executor::Executor,
+    sync::{fabric_begin_bridge, fabric_end_bridge},
+};
+use windows_core::{implement, Interface};
 
 use crate::{
     data::{OperationDataBridge, OperationDataProxy},
@@ -46,42 +46,52 @@ impl<T: OperationDataStream, E: Executor> IFabricOperationDataStream_Impl
         &self,
         callback: Option<&IFabricAsyncOperationCallback>,
     ) -> windows_core::Result<IFabricAsyncOperationContext> {
-        let inner_cp = self.inner.clone();
-        let callback_cp = callback.unwrap().clone();
+        let inner = self.inner.clone();
+        fabric_begin_bridge(&self.rt, callback, async move {
+            inner.get_next().await.map(|opt| {
+                opt.map_or_else(
+                    // convert end of stream of none. lazy eval.
+                    || unsafe { IFabricOperationData::from_raw(std::ptr::null_mut()) },
+                    |x| IFabricOperationData::from(OperationDataBridge::new(x)),
+                )
+            })
+            //.unwrap_or(Ok(unsafe { IFabricOperationData::from_raw(std::ptr::null_mut()) }));
+        })
 
-        let ctx: IFabricAsyncOperationContext =
-            BridgeContext::<mssf_core::Result<IFabricOperationData>>::new(callback_cp).into();
+        // let ctx: IFabricAsyncOperationContext =
+        //     BridgeContext::<mssf_core::Result<IFabricOperationData>>::new(callback_cp).into();
 
-        let ctx_cpy = ctx.clone();
-        self.rt.spawn(async move {
-            let ok = inner_cp.get_next().await;
-            let ctx_bridge: &BridgeContext<mssf_core::Result<Option<IFabricOperationData>>> =
-                unsafe { ctx_cpy.as_impl() };
-            // convert end of stream of none
-            let data_bridge =
-                ok.map(|opt| opt.map(|x| IFabricOperationData::from(OperationDataBridge::new(x))));
-            ctx_bridge.set_content(data_bridge);
-            let cb = ctx_bridge.Callback().unwrap();
-            unsafe { cb.Invoke(&ctx_cpy) };
-        });
-        Ok(ctx)
+        // let ctx_cpy = ctx.clone();
+        // self.rt.spawn(async move {
+        //     let ok = inner_cp.get_next().await;
+        //     let ctx_bridge: &BridgeContext<mssf_core::Result<Option<IFabricOperationData>>> =
+        //         unsafe { ctx_cpy.as_impl() };
+        //     // convert end of stream of none
+        //     let data_bridge =
+        //         ok.map(|opt| opt.map(|x| IFabricOperationData::from(OperationDataBridge::new(x))));
+        //     ctx_bridge.set_content(data_bridge);
+        //     let cb = ctx_bridge.Callback().unwrap();
+        //     unsafe { cb.Invoke(&ctx_cpy) };
+        // });
+        // Ok(ctx)
     }
 
     fn EndGetNext(
         &self,
         context: Option<&IFabricAsyncOperationContext>,
     ) -> windows_core::Result<IFabricOperationData> {
-        let ctx_bridge: &BridgeContext<mssf_core::Result<Option<IFabricOperationData>>> =
-            unsafe { context.unwrap().as_impl() };
-        // return nullptr is opt is none for end of stream.
-        let opt = ctx_bridge.consume_content()?;
-        match opt {
-            Some(data) => Ok(data),
-            // Returns a nullptr for the caller. The com is detached and no ref count missed.
-            // This is a special API, the caller needs to check the returned obj and mem::forget
-            // the com obj to avoid refcount error.
-            None => Ok(unsafe { IFabricOperationData::from_raw(std::ptr::null_mut()) }),
-        }
+        fabric_end_bridge(context)
+        // let ctx_bridge: &BridgeContext<mssf_core::Result<Option<IFabricOperationData>>> =
+        //     unsafe { context.unwrap().as_impl() };
+        // // return nullptr is opt is none for end of stream.
+        // let opt = ctx_bridge.consume_content()?;
+        // match opt {
+        //     Some(data) => Ok(data),
+        //     // Returns a nullptr for the caller. The com is detached and no ref count missed.
+        //     // This is a special API, the caller needs to check the returned obj and mem::forget
+        //     // the com obj to avoid refcount error.
+        //     None => Ok(unsafe { IFabricOperationData::from_raw(std::ptr::null_mut()) }),
+        // }
     }
 }
 

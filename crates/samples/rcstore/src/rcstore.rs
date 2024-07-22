@@ -11,13 +11,17 @@ use std::{
 };
 
 use log::info;
-use mssf_core::runtime::{
-    executor::{DefaultExecutor, Executor},
-    stateful::{
-        PrimaryReplicator, StatefulServiceFactory, StatefulServicePartition, StatefulServiceReplica,
+use mssf_core::{
+    runtime::{
+        executor::{DefaultExecutor, Executor},
+        stateful::{
+            PrimaryReplicator, StatefulServiceFactory, StatefulServicePartition,
+            StatefulServiceReplica,
+        },
+        stateful_proxy::PrimaryReplicatorProxy,
+        stateful_types::OpenMode,
     },
-    stateful_proxy::PrimaryReplicatorProxy,
-    stateful_types::{OpenMode, Role},
+    types::ReplicaRole,
 };
 use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
     IFabricDataLossHandler, TxnReplicator_Settings,
@@ -195,10 +199,10 @@ impl StatefulServiceReplica for Replica {
 
         Ok(PrimaryReplicatorProxy::new(p))
     }
-    async fn change_role(&self, newrole: Role) -> ::windows_core::Result<HSTRING> {
+    async fn change_role(&self, newrole: ReplicaRole) -> ::windows_core::Result<HSTRING> {
         info!("Replica::change_role {:?}", newrole);
 
-        if newrole == Role::Primary {
+        if newrole == ReplicaRole::Primary {
             self.svc.start_loop();
         }
         let addr = HSTRING::from(format!("http://localhost:{}", self.grpc_port));
