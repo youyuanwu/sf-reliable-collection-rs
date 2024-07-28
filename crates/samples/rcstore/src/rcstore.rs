@@ -224,12 +224,12 @@ impl StatefulServiceReplica for Replica {
 pub mod rpc {
     use std::sync::Arc;
 
-    use async_trait::async_trait;
     use sfrc_c::Microsoft::ServiceFabric::ReliableCollectionRuntime::{
         StateProvider_Info, StateProvider_Info_V1_Size, StateProvider_Kind_Store,
         Store_LockMode_Exclusive,
     };
     use sfrc_core::wrap::{StateProvider, TxnReplicaReplicator};
+    use tonic::async_trait;
     use windows::Win32::Foundation::ERROR_NOT_FOUND;
     use windows_core::{Error, HSTRING, PCWSTR};
 

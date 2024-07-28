@@ -15,16 +15,15 @@ windows-core.workspace = true
 bytes.workspace = true
 serde_json.workspace = true
 serde.workspace = true
-async-trait = "*" # needed by tonic
-tonic = "*"
-prost = "*"
+tonic.workspace = true
+prost.workspace = true
 
 [dev-dependencies]
 lazy_static.workspace = true
 
 [build-dependencies]
-tonic-build = "*"
-prost-build = "*"
+tonic-build.workspace = true
+prost-build.workspace = true
 
 [package.metadata.rust-analyzer]
 cargo.loadOutDirsFromCheck = true

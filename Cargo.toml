@@ -20,6 +20,11 @@ tokio-util = "0.7"
 serde_json = "1"
 serde = {version = "1", features = ["derive"]}
 lazy_static = "1"
+tonic = "0.11"
+prost = "0.12"
+tonic-build = "0.11"
+prost-build = "0.12"
+clap = { version = "4.5.7", features = ["derive"] }
 
 # testing code not released in cargo yet
 [patch.crates-io]

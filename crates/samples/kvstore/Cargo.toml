@@ -12,12 +12,12 @@ tokio.workspace = true
 windows-core = "0.57"
 mssf-com.workspace = true
 mssf-core.workspace = true
-tonic = "*"
-prost = "*"
+tonic.workspace = true
+prost.workspace = true
 
 [build-dependencies]
-tonic-build = "*"
-prost-build = "*"
+tonic-build.workspace = true
+prost-build.workspace = true
 
 [package.metadata.rust-analyzer]
 cargo.loadOutDirsFromCheck = true

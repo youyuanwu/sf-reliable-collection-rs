@@ -12,15 +12,14 @@ path = "rccli/main.rs"
 [dependencies]
 log = "*"
 env_logger = "*"
-tokio = { version = "1", features = ["full"] }
+tokio.workspace = true
 windows-core.workspace = true
 windows.workspace = true
 mssf-core.workspace = true
 mssf-com.workspace = true
-async-trait = "*" # needed by tonic
-tonic = "*"
-prost = "*"
-clap = { version = "4.5.7", features = ["derive"] }
+tonic.workspace = true
+prost.workspace = true
+clap.workspace = true
 
 [dependencies.sfrc-core]
 path = "../../libs/core"
@@ -30,8 +29,8 @@ path = "../../libs/core"
 path = "../../libs/c"
 
 [build-dependencies]
-tonic-build = "*"
-prost-build = "*"
+tonic-build.workspace = true
+prost-build.workspace = true
 
 [package.metadata.rust-analyzer]
 cargo.loadOutDirsFromCheck = true

@@ -14,4 +14,4 @@ mssf-com.workspace = true
 windows.workspace = true
 
 # tokio oneshot
-tokio = { version = "*", features = ["sync"] }
+tokio = { version = "1", features = ["sync"] }
