@@ -19,8 +19,9 @@ tokio = { version = "1", features = ["full"] }
 tokio-util = "0.7"
 serde_json = "1"
 serde = {version = "1", features = ["derive"]}
+lazy_static = "1"
 
 # testing code not released in cargo yet
 [patch.crates-io]
-mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "dd46f7ea733892a57452c4d6389ae1fcdd4d2024"}
-mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "dd46f7ea733892a57452c4d6389ae1fcdd4d2024"}
+mssf-core = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "898e95dc348b5a04b2f8a763c3bcae39021c1dca"}
+mssf-com = {git = "https://github.com/youyuanwu/service-fabric-rs-fork.git", rev = "898e95dc348b5a04b2f8a763c3bcae39021c1dca"}

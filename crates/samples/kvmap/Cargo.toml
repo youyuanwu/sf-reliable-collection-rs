@@ -19,6 +19,9 @@ async-trait = "*" # needed by tonic
 tonic = "*"
 prost = "*"
 
+[dev-dependencies]
+lazy_static.workspace = true
+
 [build-dependencies]
 tonic-build = "*"
 prost-build = "*"
