@@ -7,8 +7,9 @@ use mssf_core::{
         FabricClient,
     },
     types::{
-        ServicePartition, ServicePartitionInformation, ServicePartitionQueryDescription,
-        ServicePartitionStatus,
+        ReplicaRole, RestartReplicaDescription, ServicePartition, ServicePartitionInformation,
+        ServicePartitionQueryDescription, ServicePartitionStatus, ServiceReplicaQueryDescription,
+        ServiceReplicaQueryResult,
     },
     GUID, HSTRING,
 };
@@ -24,6 +25,7 @@ lazy_static! {
     static ref KV_MAP_SVC_URI: HSTRING = HSTRING::from("fabric:/KvMap/KvMapService");
     static ref FABRIC_CLIENT: FabricClient = FabricClient::new();
 }
+
 // helper for managing app
 pub struct KvMapMgmt {
     svc: ServiceManagementClient,
@@ -89,11 +91,49 @@ impl KvMapMgmt {
         };
         (single.id, stateful.partition_status)
     }
+
+    // returns secondary for now.
+    pub async fn get_replicas(&self, partition_id: GUID) -> (i64, HSTRING) {
+        let desc = ServiceReplicaQueryDescription {
+            partition_id: partition_id,
+            replica_id_or_instance_id_filter: None,
+        };
+
+        let replicas = self.query.get_replica_list(&desc, TIMEOUT).await.unwrap();
+        let replicas = replicas
+            .iter()
+            .map(|x| match x {
+                ServiceReplicaQueryResult::Stateful(s) => s,
+                _ => panic!("not stateful"),
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(replicas.len(), 2);
+
+        // let primary = replicas
+        //     .iter()
+        //     .find(|r| r.replica_role == ReplicaRole::Primary)
+        //     .unwrap();
+        let secondary = replicas
+            .iter()
+            .find(|r| r.replica_role != ReplicaRole::Primary)
+            .unwrap();
+        // make a copy TODO: fix core crate to enable clone
+        (secondary.replica_id, secondary.node_name.clone())
+    }
+
+    pub async fn restart_replica(&self, node_name: HSTRING, partition_id: GUID, replica_id: i64) {
+        let desc = RestartReplicaDescription {
+            node_name: node_name,
+            partition_id: partition_id,
+            replica_or_instance_id: replica_id,
+        };
+        self.svc.restart_replica(&desc, TIMEOUT).await.unwrap();
+    }
 }
 
 #[tokio::test]
 async fn read_write_test() {
-    let _ = PERMIT.acquire().await.unwrap();
+    let _token = PERMIT.acquire().await.unwrap();
 
     // resolve port on local onebox
     let c = KvMapMgmt::new(&FABRIC_CLIENT);
@@ -151,8 +191,22 @@ async fn read_write_test() {
 // TODO: perform failover.
 #[tokio::test]
 async fn failover_test() {
-    let _ = PERMIT.acquire().await.unwrap();
+    let _token = PERMIT.acquire().await.unwrap();
     let c = KvMapMgmt::new(&FABRIC_CLIENT);
-    let (_, status) = c.get_partition().await;
-    assert_eq!(status, ServicePartitionStatus::Ready)
+    let (partition_id, status) = c.get_partition().await;
+    assert_eq!(status, ServicePartitionStatus::Ready);
+
+    let (s_id, node_name) = c.get_replicas(partition_id).await;
+    // restart secondary
+    c.restart_replica(node_name, partition_id, s_id).await;
+
+    // wait some time for replica to be up
+    tokio::time::sleep(Duration::from_secs(2)).await;
+    // restart primary
+    // c.restart_replica(HSTRING::from("TODO"), partition_id, p_id)
+    // .await;
+
+    // wait some time for replica to be up for other tests
+    tokio::time::sleep(Duration::from_secs(5)).await;
+    // TODO: impl utilities to wait for replica to be healthy
 }
